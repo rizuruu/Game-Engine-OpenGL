@@ -1,6 +1,6 @@
+#pragma once
 // Includes
 #include "GLUTCallbacks.h"
-#include "HelloGL.h"
 
 // Namespace implementation
 namespace GLUTCallbacks

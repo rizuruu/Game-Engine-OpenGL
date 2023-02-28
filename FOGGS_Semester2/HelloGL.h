@@ -6,12 +6,28 @@
 
 #define REFRESHRATE 16
 
+struct Vector3
+{
+	float x;
+	float y;
+	float z;
+};
+
+struct Camera
+{
+	Vector3 eye;
+	Vector3 center;
+	Vector3 up;
+};
+
 class HelloGL
 {
 private:
 	float rotation;
 
 public:
+	Camera* camera;
+
 	HelloGL(int argc, char* argv[]);
 	~HelloGL(void);
 
@@ -22,4 +38,3 @@ public:
 
 	void Keyboard(unsigned char key, int x, int y);
 };
-

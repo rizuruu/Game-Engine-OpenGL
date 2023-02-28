@@ -1,3 +1,4 @@
+#pragma once
 #include "HelloGL.h"
 
 int main(int argc, char* argv[])

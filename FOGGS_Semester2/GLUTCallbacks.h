@@ -1,4 +1,6 @@
 #pragma once
+#include "HelloGL.h"
+
 class HelloGL;
 
 namespace GLUTCallbacks
