@@ -3,22 +3,10 @@
 #include <gl/GL.h> //OpenGL 
 #include <gl/GLU.h> //OpenGL Utilities 
 #include "GL\freeglut.h" //freeglut library
+#include "Structures.h"
+#include "Cube.h"
 
 #define REFRESHRATE 16
-
-struct Vector3
-{
-	float x;
-	float y;
-	float z;
-};
-
-struct Camera
-{
-	Vector3 eye;
-	Vector3 center;
-	Vector3 up;
-};
 
 class HelloGL
 {
@@ -27,6 +15,7 @@ private:
 
 public:
 	Camera* camera;
+	Cube* cube;
 
 	HelloGL(int argc, char* argv[]);
 	~HelloGL(void);
