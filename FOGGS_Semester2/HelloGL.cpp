@@ -3,6 +3,18 @@
 
 HelloGL::HelloGL(int argc, char* argv[])
 {
+	InitObjects();
+	InitGL(argc, argv);
+	glutMainLoop();
+}
+
+HelloGL::~HelloGL(void)
+{
+	delete camera;
+}
+
+void HelloGL::InitObjects()
+{
 	cube = new Cube();
 	//camera initilisation
 	camera = new Camera();
@@ -12,7 +24,10 @@ HelloGL::HelloGL(int argc, char* argv[])
 	camera->up.x = 0.0f; camera->up.y = 1.0f; camera->up.z = 0.0f;
 
 	rotation = 0.0f;
+}
 
+void HelloGL::InitGL(int argc, char* argv[])
+{
 	GLUTCallbacks::Init(this);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE); //enables double buffering
@@ -30,15 +45,6 @@ HelloGL::HelloGL(int argc, char* argv[])
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	//glEnable(GL_BACK);
-
-
-	glutMainLoop();
-}
-
-HelloGL::~HelloGL(void)
-{
-	delete camera;
 }
 
 void HelloGL::Display()

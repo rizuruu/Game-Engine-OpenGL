@@ -18,6 +18,8 @@ public:
 
 	HelloGL(int argc, char* argv[]);
 	~HelloGL(void);
+	void InitObjects();
+	void InitGL(int argc, char* argv[]);
 
 	void Update();
 
