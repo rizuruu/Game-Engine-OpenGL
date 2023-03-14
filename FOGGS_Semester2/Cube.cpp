@@ -29,7 +29,7 @@ Cube::~Cube()
 void Cube::Draw()
 {
 	// std::cout << "drawing";
-	glRotatef(_rotation, 0.0f, 1.0f, 1.0f);
+	glRotatef(_rotation, 1.0f, 0.0f, 1.0f);
 	glTranslatef(0.0f, 0.0f, 0.0f);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);

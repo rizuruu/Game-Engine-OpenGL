@@ -12,7 +12,6 @@ class HelloGL
 {
 private:
 	float rotation;
-
 public:
 	Camera* camera;
 	Cube* cube;
@@ -23,7 +22,5 @@ public:
 	void Update();
 
 	void Display();
-	void DrawPolygon();
-
 	void Keyboard(unsigned char key, int x, int y);
 };
