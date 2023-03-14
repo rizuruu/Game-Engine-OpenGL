@@ -5,7 +5,7 @@
 #include "GL\freeglut.h" //freeglut library
 #include "Structures.h"
 #include "Cube.h"
-
+#include "MeshLoader.h"
 #define REFRESHRATE 16
 
 class HelloGL

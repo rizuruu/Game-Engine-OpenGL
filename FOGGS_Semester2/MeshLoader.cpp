@@ -30,12 +30,34 @@ namespace MeshLoader
 
 	void LoadColours(ifstream& inFile, Mesh& mesh)
 	{
-		//TODO: LOAD COLOURS
+		inFile >> mesh.ColorCount;
+
+		if (mesh.ColorCount > 0)
+		{
+			mesh.Colors = new Color[mesh.ColorCount];
+
+			for (int i = 0; i < mesh.ColorCount; i++)
+			{
+				inFile >> mesh.Colors[i].r;
+				inFile >> mesh.Colors[i].g;
+				inFile >> mesh.Colors[i].b;
+			}
+		}
 	}
 
 	void LoadIndices(ifstream& inFile, Mesh& mesh)
 	{
-		//TODO: Load Indices
+		inFile >> mesh.IndexCount;
+
+		if (mesh.IndexCount > 0)
+		{
+			mesh.Indices = new GLushort[mesh.IndexCount];
+
+			for (int i = 0; i < mesh.IndexCount; i++)
+			{
+				inFile >> mesh.Indices[i];
+			}
+		}
 	}
 
 	Mesh* MeshLoader::Load(char* path)
@@ -53,6 +75,19 @@ namespace MeshLoader
 		}
 
 		//LOAD DATA USING METHODS ABOVE
+		inFile >> numVertices;
+		indexedVertices = new Vertex[numVertices];
+		for (int i = 0; i < numVertices; i++)
+		{
+			LoadVertices(inFile, *mesh);
+		}
+
+		//TODO: Load Color information
+		LoadColours(inFile, *mesh);
+		//TODO: Load Indices information
+		LoadIndices(inFile, *mesh);
+
+		inFile.close();
 
 		return mesh;
 	}

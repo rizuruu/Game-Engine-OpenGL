@@ -15,7 +15,8 @@ HelloGL::~HelloGL(void)
 
 void HelloGL::InitObjects()
 {
-	cube = new Cube();
+	Mesh* cubeMesh = MeshLoader::Load("cube.txt");
+	cube = new Cube(cubeMesh, 0.0f, 0.0f, 0.0f);
 	//camera initilisation
 	camera = new Camera();
 	//camera->eye.x = 0.0f; camera->eye.y = 0.0f; camera->eye.z = 1.0f; 
