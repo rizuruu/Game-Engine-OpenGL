@@ -4,7 +4,12 @@
 #include <iostream>
 
 ModelLoader::ModelLoader(const std::string& objFilename, const std::string& textureFilename)
-    : textureID(0) {  // Initialize textureID to 0
+    : textureID(0), Name(objFilename) {  // Initialize textureID to 0
+
+    Transform.Scale.x = 1.0;
+    Transform.Scale.y = 1.0;
+    Transform.Scale.z = 1.0;
+
     if (!loadObj(objFilename)) {
         std::cerr << "Failed to load OBJ file: " << objFilename << std::endl;
     }
@@ -23,6 +28,17 @@ void ModelLoader::render() {
         return;
     }
 
+    // Translation
+    glTranslatef(Transform.Position.x, Transform.Position.y, Transform.Position.z);
+
+    //Rotation
+    glRotatef(Transform.Rotation.x, 1.0f, 0.0f, 0.0f);
+    glRotatef(Transform.Rotation.y, 0.0f, 1.0f, 0.0f);
+    glRotatef(Transform.Rotation.z, 0.0f, 0.0f, 1.0f);
+
+    //Scaling
+    glScalef(Transform.Scale.x, Transform.Scale.y, Transform.Scale.z);
+
     GLfloat color[4] = { 1.0, 1.0, 1.0 , 1.0 };
     glColor4fv(color);
     GLfloat specular[] = { 1.0f, 1.0f, 1.0f },
@@ -32,7 +48,6 @@ void ModelLoader::render() {
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
-    glTranslatef(0, 2.7, 0);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 

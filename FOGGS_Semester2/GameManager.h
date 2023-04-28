@@ -12,6 +12,7 @@
 #include "Skybox.h"
 #include "ObjLoader.h"
 #include <cstdint>
+#include "ModelLoader.h"
 
 using namespace std;
 using namespace ImGui;
@@ -42,7 +43,7 @@ private:
 	Skybox* SkyboxRenderer;
 	float* velocity = new float();
 	bool isEditor = true;
-	vector<ObjLoader*> Models;
+	vector<ModelLoader*> Models;
 	char inputText[256] = { 0 };
 	ImFont* customFont = nullptr;
 

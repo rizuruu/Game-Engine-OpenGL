@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <GL/freeglut.h>
+#include "Transform.h"
 
 class ModelLoader {
 public:
@@ -11,6 +12,8 @@ public:
     ~ModelLoader();
 
     void render();
+    Transform Transform;
+    std::string Name;
 
 private:
     struct Vertex {

@@ -3,7 +3,6 @@
 #include "Constants.h"
 #include <fstream>
 #include <imgui/imgui_internal.h>
-#include "ModelLoader.h"
 
 using namespace std;
 using namespace ImGui;
@@ -40,6 +39,7 @@ void GameManager::Init(int argc, char** argv) {
 	// Load the model and texture
 	try {
 		model = new ModelLoader("..\\Assets\\Models\\model.obj", "..\\Assets\\Textures\\model.bmp");
+		Models.push_back(model);
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
@@ -462,23 +462,30 @@ void GameManager::guiInteraction()
 				{
 					ImGui::Text("Transform");
 					ImGui::Indent();
-					if (ImGui::CollapsingHeader("Position"))
+					if (ImGui::CollapsingHeader(i + " Position"))
 					{
-						ImGui::SliderFloat("X", &Models[i]->Transform.Position.x, -10.0f, 10.0f);
-						ImGui::SliderFloat("Y", &Models[i]->Transform.Position.y, -10.0f, 10.0f);
-						ImGui::SliderFloat("Z", &Models[i]->Transform.Position.z, -10.0f, 10.0f);
+						ImGui::SliderFloat("X Position", &Models[i]->Transform.Position.x, -10.0f, 10.0f);
+						ImGui::SliderFloat("Y Position", &Models[i]->Transform.Position.y, -10.0f, 10.0f);
+						ImGui::SliderFloat("Z Position", &Models[i]->Transform.Position.z, -10.0f, 10.0f);
 					}
-					if (ImGui::CollapsingHeader("Rotation"))
+					if (ImGui::CollapsingHeader(i + " Rotation"))
 					{
-						ImGui::SliderFloat("X", &Models[i]->Transform.Rotation.x, 0.0f, 360.0f);
-						ImGui::SliderFloat("Y", &Models[i]->Transform.Rotation.y, 0.0f, 360.0f);
-						ImGui::SliderFloat("Z", &Models[i]->Transform.Rotation.z, 0.0f, 360.0f);
+						ImGui::SliderFloat("X Rotation", &Models[i]->Transform.Rotation.x, 0.0f, 360.0f);
+						ImGui::SliderFloat("Y Rotation", &Models[i]->Transform.Rotation.y, 0.0f, 360.0f);
+						ImGui::SliderFloat("Z Rotation", &Models[i]->Transform.Rotation.z, 0.0f, 360.0f);
 					}
-					if (ImGui::CollapsingHeader("Scale"))
+					if (ImGui::CollapsingHeader(i + " Scale"))
 					{
-						ImGui::SliderFloat("X", &Models[i]->Transform.Scale.x, -10.0f, 10.0f);
-						ImGui::SliderFloat("Y", &Models[i]->Transform.Scale.y, -10.0f, 10.0f);
-						ImGui::SliderFloat("Z", &Models[i]->Transform.Scale.z, -10.0f, 10.0f);
+						float scale = Models[i]->Transform.Scale.x;
+						if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f))
+						{
+							Models[i]->Transform.Scale.x = scale;
+							Models[i]->Transform.Scale.y = scale;
+							Models[i]->Transform.Scale.z = scale;
+						}
+						ImGui::SliderFloat("X Scale", &Models[i]->Transform.Scale.x, 0.0f, 100.0f);
+						ImGui::SliderFloat("Y Scale", &Models[i]->Transform.Scale.y, 0.0f, 100.0f);
+						ImGui::SliderFloat("Z Scale", &Models[i]->Transform.Scale.z, 0.0f, 100.0f);
 					}
 					ImGui::Unindent();
 					if (ImGui::Button("Reset"))
@@ -517,7 +524,7 @@ void GameManager::guiInteraction()
 
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
-			saveModels(Models);
+			//saveModels(Models);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
@@ -537,15 +544,15 @@ void GameManager::guiInteraction()
 //
 void GameManager::SpawnModel(string name)
 {
-	ObjLoader* objLoader = new ObjLoader();
-	bool loaded = objLoader->loadObj(name);
-	if (loaded)
+	ModelLoader* objLoader = new ModelLoader("..\\Assets\\Models\\house.obj", "..\\Assets\\Textures\\house.bmp");
+	//bool loaded = objLoader->loadObj(name);
+	//if (loaded)
 		Models.push_back(objLoader);
 }
 
 void GameManager::DeleteModel(int i)
 {
-	ObjLoader* obj = Models[i]; 
+	ModelLoader* obj = Models[i];
 	Models.erase(Models.begin() + i); 
 	delete obj;
 }
@@ -606,7 +613,7 @@ std::vector<ObjLoader*> GameManager::loadModels() {
 		cout << transform.Position.x;
 		// Set the transform of the model
 		models[i]->Transform = transform;
-		Models.push_back(models[i]);
+		//Models.push_back(models[i]);
 	}
 
 	file.close();
