@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "ThirdParty\freeglut-3.0.0\freeglut_static.vcxproj", "{B4238C3F-F1F3-3F99-8148-784D1F909990}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FOGGS_Semester2", "FOGGS_Semester2\FOGGS_Semester2.vcxproj", "{52D912D1-4164-46B6-8A5B-17F7CA4C89CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4238C3F-F1F3-3F99-8148-784D1F909990}.Debug|x86.ActiveCfg = Debug|Win32
+		{B4238C3F-F1F3-3F99-8148-784D1F909990}.Debug|x86.Build.0 = Debug|Win32
+		{B4238C3F-F1F3-3F99-8148-784D1F909990}.Release|x86.ActiveCfg = Release|Win32
+		{B4238C3F-F1F3-3F99-8148-784D1F909990}.Release|x86.Build.0 = Release|Win32
+		{52D912D1-4164-46B6-8A5B-17F7CA4C89CF}.Debug|x86.ActiveCfg = Debug|Win32
+		{52D912D1-4164-46B6-8A5B-17F7CA4C89CF}.Debug|x86.Build.0 = Debug|Win32
+		{52D912D1-4164-46B6-8A5B-17F7CA4C89CF}.Release|x86.ActiveCfg = Release|Win32
+		{52D912D1-4164-46B6-8A5B-17F7CA4C89CF}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E16CD68F-5555-4B41-9FC0-3E7762057FFC}
+	EndGlobalSection
+EndGlobal

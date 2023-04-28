@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Floor.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Dog.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Table.cpp" />
+    <ClCompile Include="Art.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Mirror.cpp" />
+    <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Snowman.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="Teapot.cpp" />
+    <ClCompile Include="Walls.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\imgui\imgui_impl_freeglut.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\imgui\imgui_impl_opengl2.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GLUTCallbacks.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="ObjLoader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dog.h" />
+    <ClInclude Include="Floor.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Table.h" />
+    <ClInclude Include="Context.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Spotlight.h" />
+    <ClInclude Include="Teapot.h" />
+    <ClInclude Include="Snowman.h" />
+    <ClInclude Include="Art.h" />
+    <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Walls.h" />
+    <ClInclude Include="Mirror.h" />
+    <ClInclude Include="..\ThirdParty\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\imgui_impl_freeglut.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\imgui_impl_opengl2.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\stb_rect_pack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\stb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\imgui\stb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GLUTCallbacks.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="ObjLoader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{33e4e2a6-3788-4840-9076-a9773c436bed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\imgui\imgui.ini">
+      <Filter>imgui</Filter>
+    </None>
+  </ItemGroup>
+</Project>
