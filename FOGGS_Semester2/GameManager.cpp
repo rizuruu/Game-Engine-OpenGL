@@ -162,11 +162,19 @@ void GameManager::Display() {
 	}
 	else
 	{
-		//view mode of camera view setup
+		// Calculate the direction vector from the yaw and pitch angles
+		float dirX = sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
+		float dirY = sin(pitch * M_PI / 180.0f);
+		float dirZ = cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
+
+		// Calculate the target position by adding the direction vector to the camera's position
+		float targetX = gContext.camera.position[0] + dirX;
+		float targetY = gContext.camera.position[1] + dirY;
+		float targetZ = gContext.camera.position[2] + dirZ;
+
+		// Set up the camera using gluLookAt
 		gluLookAt(gContext.camera.position[0], gContext.camera.position[1], gContext.camera.position[2],
-			gContext.camera.position[0] + sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f),
-			gContext.camera.position[1] + sin(pitch * M_PI / 180.0f),
-			gContext.camera.position[2] + cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f),
+			targetX, targetY, targetZ,
 			0, 1, 0);
 	}
 
@@ -312,18 +320,30 @@ void GameManager::drawScene() {
 
 //keyboard events handling
 void GameManager::keyboard(unsigned char key, int, int) {
+	float cameraSpeed = 0.1f; // Adjust this value to change the camera's movement speed
+
 	switch (tolower(key)) {
 	case 'w':
 		gContext.dog.nextMove = []() { glTranslated(0, 0, 0.2); };
+		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
 		break;
 	case 'a':
 		gContext.dog.nextMove = []() { glRotatef(7, 0, 1, 0); };
+		gContext.camera.position[0] += cos(yaw * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[2] -= sin(yaw * M_PI / 180.0f) * cameraSpeed;
 		break;
 	case 's':
 		gContext.dog.nextMove = []() { glTranslated(0, 0, -0.2); };
+		gContext.camera.position[0] -= sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[1] -= sin(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[2] -= cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
 		break;
 	case 'd':
 		gContext.dog.nextMove = []() { glRotatef(-7, 0, 1, 0); };
+		gContext.camera.position[0] -= cos(yaw * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[2] += sin(yaw * M_PI / 180.0f) * cameraSpeed;
 		break;
 	case 'p':
 		isEditor = !isEditor;

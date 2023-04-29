@@ -11,7 +11,7 @@ public:
     static const std::string& SaveFileName;
 
     // To check if it has to run it in Editor mode
-    static const bool EditorMode = true;
+    static const bool EditorMode = false;
 
     // Colors
     static const ImVec4 ButtonColor;
