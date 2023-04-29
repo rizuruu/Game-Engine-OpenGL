@@ -458,23 +458,23 @@ void GameManager::guiInteraction()
 			for (int i = 0; i < Models.size(); i++)
 			{
 				char label[64];
-				if (ImGui::CollapsingHeader(Models[i]->Name.c_str()))
+				if (ImGui::CollapsingHeader(Constants::OrderNaming(i, Models[i]->Name)))
 				{
 					ImGui::Text("Transform");
 					ImGui::Indent();
-					if (ImGui::CollapsingHeader(i + " Position"))
+					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Position")))
 					{
 						ImGui::SliderFloat("X Position", &Models[i]->Transform.Position.x, -10.0f, 10.0f);
 						ImGui::SliderFloat("Y Position", &Models[i]->Transform.Position.y, -10.0f, 10.0f);
 						ImGui::SliderFloat("Z Position", &Models[i]->Transform.Position.z, -10.0f, 10.0f);
 					}
-					if (ImGui::CollapsingHeader(i + " Rotation"))
+					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Rotation")))
 					{
 						ImGui::SliderFloat("X Rotation", &Models[i]->Transform.Rotation.x, 0.0f, 360.0f);
 						ImGui::SliderFloat("Y Rotation", &Models[i]->Transform.Rotation.y, 0.0f, 360.0f);
 						ImGui::SliderFloat("Z Rotation", &Models[i]->Transform.Rotation.z, 0.0f, 360.0f);
 					}
-					if (ImGui::CollapsingHeader(i + " Scale"))
+					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Scale")))
 					{
 						float scale = Models[i]->Transform.Scale.x;
 						if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f))
@@ -544,7 +544,7 @@ void GameManager::guiInteraction()
 //
 void GameManager::SpawnModel(string name)
 {
-	ModelLoader* objLoader = new ModelLoader("..\\Assets\\Models\\house.obj", "..\\Assets\\Textures\\house.bmp");
+	ModelLoader* objLoader = new ModelLoader(Constants::GetModelPath(name), Constants::GetTexturePath(name));
 	//bool loaded = objLoader->loadObj(name);
 	//if (loaded)
 		Models.push_back(objLoader);

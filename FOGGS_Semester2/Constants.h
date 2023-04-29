@@ -16,6 +16,22 @@ public:
     // Colors
     static const ImVec4 ButtonColor;
     static const ImVec4 ButtonHoverColor;
+
+    // Paths
+    static const std::string GetModelPath(string Name)
+    {
+        return "..\\Assets\\Models\\" + Name + ".obj";
+    }
+    static const std::string GetTexturePath(string Name)
+    {
+        return "..\\Assets\\Textures\\" + Name + ".bmp";
+    }
+
+    static const char* OrderNaming(int i, const std::string& n) {
+        static std::string s; // Make 's' static so it persists after the function scope ends
+        s = "(" + std::to_string(i) + ") " + n;
+        return s.c_str();
+    }
 };
 const std::string& Constants::SaveFileName = "EngineSaveData";
 
