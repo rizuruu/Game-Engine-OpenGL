@@ -46,4 +46,11 @@ namespace GLUTCallbacks
 			helloGL->Motion(x, y);
 		}
 	}
+	void MouseWheel(int wheel, int direction, int x, int y)
+	{
+		if (helloGL != nullptr)
+		{
+			helloGL->MouseWheel(wheel, direction, x, y);
+		}
+	}
 }

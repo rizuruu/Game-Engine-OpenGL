@@ -3,19 +3,19 @@
 #include <sstream>
 #include <iostream>
 
-ModelLoader::ModelLoader(const std::string& objFilename, const std::string& textureFilename)
-    : textureID(0), Name(objFilename) {  // Initialize textureID to 0
+ModelLoader::ModelLoader(const std::string& modelName)
+    : textureID(0), Name(modelName) {  // Initialize textureID to 0
 
     Transform.Scale.x = 1.0;
     Transform.Scale.y = 1.0;
     Transform.Scale.z = 1.0;
 
-    if (!loadObj(objFilename)) {
-        std::cerr << "Failed to load OBJ file: " << objFilename << std::endl;
+    if (!loadObj(GetModelPath(Name))) {
+        std::cerr << "Failed to load OBJ file: " << GetModelPath(Name) << std::endl;
     }
 
-    if (!loadTexture(textureFilename)) {
-        std::cerr << "Failed to load texture file: " << textureFilename << std::endl;
+    if (!loadTexture(GetTexturePath(Name))) {
+        std::cerr << "Failed to load texture file: " << GetTexturePath(Name) << std::endl;
     }
 }
 

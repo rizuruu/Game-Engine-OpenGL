@@ -27,27 +27,29 @@ public:
 	void Display();
 	void Init(int argc, char** argv);
 	void Motion(int x, int y);
+	void MouseWheel(int wheel, int direction, int x, int y);
 private:
 	void SpawnModel(string name);
 	void DeleteModel(int i);
-	void saveModels(const std::vector<ObjLoader*>& models);
-	std::vector<ObjLoader*> loadModels();
+	void saveModels(const std::vector<ModelLoader*>& models);
+	void loadModels();
 	void drawHUD(const std::string& text);
 	void guiInteraction();
 	void OnSliderValueChanged(float* pValue);
 	void mouse(int button, int state, int x, int y);
 	void drawScene();
+	void readFiles();
 
 	//single point of access to all rendered objects
 	Context gContext;
 	Skybox* SkyboxRenderer;
 	float* velocity = new float();
-	bool isEditor = true;
+	bool freeLook = true;
 	vector<ModelLoader*> Models;
 	char inputText[256] = { 0 };
 	ImFont* customFont = nullptr;
 
-	// Define the file paths for the skybox textures
+	// paths for the skybox textures
 	const char* skyboxFilenames[6] = {
 		"..\\Assets\\left.bmp",
 		"..\\Assets\\right.bmp",
@@ -61,5 +63,17 @@ private:
 	float yaw = 0.0f;
 
 	int lastX, lastY;
+
+	float lastTargetX = 0;
+	float lastTargetY = 0;
+	float lastTargetZ = 0;
+
+	float freeLookSpeed = 0.1f;
+
+	std::string path = "..\\Assets\\Models\\";
+
+	std::vector<std::string> files;
+	int importSelectionIndex = 0;
+	int sceneSelectionIndex = 0;
 };
 

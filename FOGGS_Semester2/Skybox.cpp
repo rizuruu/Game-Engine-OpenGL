@@ -30,7 +30,7 @@ void Skybox::draw() {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
 
-    const float size = 150.0f;
+    const float size = 1500.0f;
 
     // Render the six faces of the skybox
     for (int i = 0; i < 6; i++) {

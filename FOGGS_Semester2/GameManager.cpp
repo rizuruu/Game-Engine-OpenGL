@@ -37,23 +37,26 @@ void GameManager::Init(int argc, char** argv) {
 	ImGui_ImplFreeGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
 	// Load the model and texture
-	try {
-		model = new ModelLoader("..\\Assets\\Models\\model.obj", "..\\Assets\\Textures\\model.bmp");
-		Models.push_back(model);
-	}
-	catch (const std::exception& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
+	//try {
+	//	model = new ModelLoader("model");
+	//	Models.push_back(model);
+	//}
+	//catch (const std::exception& e) {
+	//	std::cerr << "Error: " << e.what() << std::endl;
+	//}
 	if (!Constants::EditorMode)
 	{
-		glutKeyboardFunc((void(*)(unsigned char, int, int))GLUTCallbacks::Keyboard);
-		glutSetCursor(GLUT_CURSOR_NONE);
-		glutPassiveMotionFunc(GLUTCallbacks::Motion);
 	}
 	else
 	{
-		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+		//glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 	}
+	
+	readFiles();
+
+	glutKeyboardFunc((void(*)(unsigned char, int, int))GLUTCallbacks::Keyboard);
+	glutPassiveMotionFunc(GLUTCallbacks::Motion);
+	glutMouseWheelFunc(GLUTCallbacks::MouseWheel);
 
 	//glutMouseFunc(mouse);
 
@@ -100,7 +103,7 @@ void GameManager::Display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(40.0, io.DisplaySize.x / io.DisplaySize.y, 1.0, 1500.0);
+	gluPerspective(Constants::FOV, io.DisplaySize.x / io.DisplaySize.y, Constants::NearClippingPlane, Constants::FarClippingPlane);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -117,7 +120,7 @@ void GameManager::Display() {
 	}
 
 	//change viewing mode if in Doggy view setup
-	if (gContext.isDogView) {
+	if (!Constants::EditorMode) {
 		GLfloat viewModelMatrix[16];
 		glGetFloatv(GL_MODELVIEW_MATRIX, viewModelMatrix);
 		glLoadMatrixf(gContext.dog.local);
@@ -160,8 +163,11 @@ void GameManager::Display() {
 		// Set up the camera using gluLookAt
 		gluLookAt(cameraX, cameraY, cameraZ, targetX, targetY, targetZ, 0, 1, 0);
 	}
-	else
+	else if (Constants::EditorMode && freeLook)
 	{
+		// Lock cursor for freelook in editor mode
+		glutSetCursor(GLUT_CURSOR_NONE);
+
 		// Calculate the direction vector from the yaw and pitch angles
 		float dirX = sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
 		float dirY = sin(pitch * M_PI / 180.0f);
@@ -175,6 +181,20 @@ void GameManager::Display() {
 		// Set up the camera using gluLookAt
 		gluLookAt(gContext.camera.position[0], gContext.camera.position[1], gContext.camera.position[2],
 			targetX, targetY, targetZ,
+			0, 1, 0);
+
+		// Update the last target position
+		lastTargetX = targetX;
+		lastTargetY = targetY;
+		lastTargetZ = targetZ;
+	}
+	else
+	{
+		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+
+		// Set up the camera using gluLookAt with the last target position
+		gluLookAt(gContext.camera.position[0], gContext.camera.position[1], gContext.camera.position[2],
+			lastTargetX, lastTargetY, lastTargetZ,
 			0, 1, 0);
 	}
 
@@ -310,7 +330,7 @@ void GameManager::drawScene() {
 	}
 
 	glPushMatrix();
-	model->render();
+	//model->render();
 	glPopMatrix();
 
 	//g_objLoader.render();
@@ -318,35 +338,72 @@ void GameManager::drawScene() {
 	//gContext.walls.draw({ 0, 1 });
 }
 
-//keyboard events handling
-void GameManager::keyboard(unsigned char key, int, int) {
-	float cameraSpeed = 0.1f; // Adjust this value to change the camera's movement speed
+void GameManager::readFiles()
+{
+	files.clear();
+#ifdef _WIN32
+	WIN32_FIND_DATAA fileData;
+	HANDLE hFind = FindFirstFileA((path + "*").c_str(), &fileData);
 
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				std::string filename = fileData.cFileName;
+				if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
+					files.push_back(filename);
+				}
+			}
+		} while (FindNextFileA(hFind, &fileData));
+		FindClose(hFind);
+	}
+#else
+	DIR* dir = opendir(path.c_str());
+
+	if (dir != nullptr) {
+		dirent* entry;
+		while ((entry = readdir(dir)) != nullptr) {
+			std::string filename = entry->d_name;
+			if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
+				files.push_back(filename);
+			}
+		}
+		closedir(dir);
+	}
+#endif
+
+	for (const auto& file : files) {
+		std::cout << file << std::endl;
+	}
+}
+
+//keyboard events handling
+void GameManager::keyboard(unsigned char key, int, int) 
+{
 	switch (tolower(key)) {
 	case 'w':
 		gContext.dog.nextMove = []() { glTranslated(0, 0, 0.2); };
-		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'a':
 		gContext.dog.nextMove = []() { glRotatef(7, 0, 1, 0); };
-		gContext.camera.position[0] += cos(yaw * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[2] -= sin(yaw * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[0] += cos(yaw * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[2] -= sin(yaw * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 's':
 		gContext.dog.nextMove = []() { glTranslated(0, 0, -0.2); };
-		gContext.camera.position[0] -= sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[1] -= sin(pitch * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[2] -= cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[0] -= sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[1] -= sin(pitch * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[2] -= cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'd':
 		gContext.dog.nextMove = []() { glRotatef(-7, 0, 1, 0); };
-		gContext.camera.position[0] -= cos(yaw * M_PI / 180.0f) * cameraSpeed;
-		gContext.camera.position[2] += sin(yaw * M_PI / 180.0f) * cameraSpeed;
+		gContext.camera.position[0] -= cos(yaw * M_PI / 180.0f) * freeLookSpeed;
+		gContext.camera.position[2] += sin(yaw * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'p':
-		isEditor = !isEditor;
+		freeLook = !freeLook;
 		break;
 		// Handle other key presses
 	default:
@@ -364,83 +421,91 @@ void GameManager::mouse(int button, int state, int x, int y)
 
 //
 void GameManager::Motion(int x, int y) {
-	static int last_x = -1;
-	static int last_y = -1;
+	// Re-center the cursor
+	if (freeLook) {
 
-	if (last_x == -1 && last_y == -1) {
-		last_x = x;
-		last_y = y;
+		// Center of the screen
+		int center_x = glutGet(GLUT_WINDOW_WIDTH) / 2;
+		int center_y = glutGet(GLUT_WINDOW_HEIGHT) / 2;
+
+		// If the cursor is already at the center, do nothing
+		if (x == center_x && y == center_y) {
+			return;
+		}
+
+		int delta_x = x - center_x;
+		int delta_y = y - center_y;
+
+		// Invert delta values to reverse mouse movement
+		delta_x *= -1;
+		delta_y *= -1;
+
+		// Update camera yaw and pitch based on mouse movement
+		yaw += delta_x * 0.2f;
+		pitch += delta_y * 0.2f;
+
+		// Make sure pitch stays within [-90, 90] degrees
+		pitch = fmaxf(-90.0f, fminf(90.0f, pitch));
+
+		glutWarpPointer(center_x, center_y);
 	}
 
-	int delta_x = x - last_x;
-	int delta_y = y - last_y;
+	glutPostRedisplay();
+}
 
-	// Invert delta values to reverse mouse movement
-	delta_x *= -1;
-	delta_y *= -1;
-
-	// Update camera yaw and pitch based on mouse movement
-	yaw += delta_x * 0.2f;
-	pitch += delta_y * 0.2f;
-
-	// Make sure pitch stays within [-90, 90] degrees
-	pitch = fmaxf(-90.0f, fminf(90.0f, pitch));
-
-	last_x = x;
-	last_y = y;
-
-	// Center of the screen
-	int center_x = glutGet(GLUT_WINDOW_WIDTH) / 2;
-	int center_y = glutGet(GLUT_WINDOW_HEIGHT) / 2;
-
+void GameManager::MouseWheel(int wheel, int direction, int x, int y) {
+	if (freeLook)
+	{
+		if (direction > 0) {
+			// Scroll up
+			if (freeLookSpeed < 5.0f)
+				freeLookSpeed += 0.1f;
+		}
+		else {
+			// Scroll down
+			if (freeLookSpeed > 0.1f)
+				freeLookSpeed -= 0.1f;
+			else
+				freeLookSpeed = 0.1f;
+		}
+	}
 	glutPostRedisplay();
 }
 
 //gui interaction handling via imgui
 void GameManager::guiInteraction()
 {
-	//ImGui::PushStyleColor(ImGuiCol_TitleBg , ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
-	//ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-
 	ImGuiWindowFlags window_flags = 0;
 	if (ImGui::Begin("My Scene Properties", false, window_flags))
 	{
 		//ImGui::RadioButton("external view", &gContext.isDogView, 0); ImGui::SameLine();
 		//ImGui::RadioButton("doggy view", &gContext.isDogView, 1);
 
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, 100); // set width of first column
-		ImGui::Text("Model name:");
-		ImGui::NextColumn();
-		ImGui::InputText("without extension", inputText, 256);
-		ImGui::Columns(1); // reset to a single column
+		ImGui::Text("Select Model to import:");
+		ImGui::SameLine();
+		if (ImGui::Button("Refresh"))
+		{
+			readFiles();
+		}
+
+		ImGui::ListBox("", &importSelectionIndex,
+			[](void* data, int index, const char** out_text) {
+				*out_text = (*(std::vector<std::string>*)data)[index].c_str();
+				return true;
+			}, (void*)&files, files.size());
 
 		float fullWidth = ImGui::GetContentRegionAvailWidth();
-		ImVec2 fullSizeButton(fullWidth, 20); // You can adjust the height value according to your needs
+		ImVec2 fullSizeButton(fullWidth, 20); 
 		if (ImGui::Button("IMPORT", fullSizeButton))
 		{
-			SpawnModel(inputText);
+			cout << Constants::NameWithoutExt(files[importSelectionIndex]) << endl;
+
+			SpawnModel(Constants::NameWithoutExt(files[importSelectionIndex]));
 		}
 
-		ImVec2 verticalSpacing(0.0f, 10.0f); // Adjust the height value according to your needs
+		ImVec2 verticalSpacing(0.0f, 10.0f); 
 		ImGui::Dummy(verticalSpacing);
 
-		if (ImGui::CollapsingHeader("Dog"))
-		{
-			ImGui::SliderFloat("head horizontal", &gContext.dog.headHorizontalAngle, -30.0f, 30.0f);
-			ImGui::SliderFloat("head vertical", &gContext.dog.headVerticalAngle, -5.0f, 50.0f);
-			ImGui::SliderFloat("tail horizontal", &gContext.dog.tailHorizontalAngle, -25.0f, 25.0f);
-			ImGui::SliderFloat("tail vertical", &gContext.dog.tailVerticalAngle, -14.0f, 50.0f);
-		}
-		if (ImGui::CollapsingHeader("Camera"))
-		{
-			ImGui::SliderFloat("camera source x", &gContext.camera.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("camera source y", &gContext.camera.position[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("camera source z", &gContext.camera.position[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("camera target x", &gContext.camera.target[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("camera target y", &gContext.camera.target[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("camera target z", &gContext.camera.target[2], -10.0f, 10.0f);
-		}
 		static bool pointlight = true;
 		static bool spotlight = true;
 		if (ImGui::CollapsingHeader("Lights"))
@@ -467,67 +532,62 @@ void GameManager::guiInteraction()
 			pointlight ? gContext.pointlight.enable() : gContext.pointlight.disable();
 			spotlight ? gContext.spotlight.enable() : gContext.spotlight.disable();
 		}
-		if (ImGui::CollapsingHeader("Walls"))
-		{
-			ImGui::SliderFloat("alpha channel", &gContext.walls.alpha, 0.0f, 1.0f);
-		}
 
-		if (ImGui::CollapsingHeader("Imports")) {
-			ImGui::Text("Imported models");
+		if (ImGui::CollapsingHeader("Scene Hierarchy")) {
+			ImGui::Text("Scene");
+			// Display the list of model names using ImGui::ListBox()
+			ImGui::ListBox(".", &sceneSelectionIndex,
+				[](void* data, int index, const char** out_text) {
+					std::vector<ModelLoader*>* models = (std::vector<ModelLoader*>*)data;
+					*out_text = (*models)[index]->Name.c_str();
+					return true;
+				}, &Models, Models.size());
+
 			ImGui::Indent();
-			for (int i = 0; i < Models.size(); i++)
-			{
-				char label[64];
-				if (ImGui::CollapsingHeader(Constants::OrderNaming(i, Models[i]->Name)))
+
+			if (Models.size() != 0 && sceneSelectionIndex != -1) {
+				ImGui::Text("Transform");
+				if (ImGui::CollapsingHeader("Position"))
 				{
-					ImGui::Text("Transform");
-					ImGui::Indent();
-					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Position")))
+					ImGui::SliderFloat("X Position", &Models[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
+					ImGui::SliderFloat("Y Position", &Models[sceneSelectionIndex]->Transform.Position.y, -10.0f, 10.0f);
+					ImGui::SliderFloat("Z Position", &Models[sceneSelectionIndex]->Transform.Position.z, -10.0f, 10.0f);
+				}
+				if (ImGui::CollapsingHeader("Rotation"))
+				{
+					ImGui::SliderFloat("X Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
+					ImGui::SliderFloat("Y Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.y, 0.0f, 360.0f);
+					ImGui::SliderFloat("Z Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.z, 0.0f, 360.0f);
+				}
+				if (ImGui::CollapsingHeader("Scale"))
+				{
+					float scale = Models[sceneSelectionIndex]->Transform.Scale.x;
+					if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f, "%.2f", 2.0f))
 					{
-						ImGui::SliderFloat("X Position", &Models[i]->Transform.Position.x, -10.0f, 10.0f);
-						ImGui::SliderFloat("Y Position", &Models[i]->Transform.Position.y, -10.0f, 10.0f);
-						ImGui::SliderFloat("Z Position", &Models[i]->Transform.Position.z, -10.0f, 10.0f);
+						Models[sceneSelectionIndex]->Transform.Scale.x = scale;
+						Models[sceneSelectionIndex]->Transform.Scale.y = scale;
+						Models[sceneSelectionIndex]->Transform.Scale.z = scale;
 					}
-					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Rotation")))
-					{
-						ImGui::SliderFloat("X Rotation", &Models[i]->Transform.Rotation.x, 0.0f, 360.0f);
-						ImGui::SliderFloat("Y Rotation", &Models[i]->Transform.Rotation.y, 0.0f, 360.0f);
-						ImGui::SliderFloat("Z Rotation", &Models[i]->Transform.Rotation.z, 0.0f, 360.0f);
-					}
-					if (ImGui::CollapsingHeader(Constants::OrderNaming(i, "Scale")))
-					{
-						float scale = Models[i]->Transform.Scale.x;
-						if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f))
-						{
-							Models[i]->Transform.Scale.x = scale;
-							Models[i]->Transform.Scale.y = scale;
-							Models[i]->Transform.Scale.z = scale;
-						}
-						ImGui::SliderFloat("X Scale", &Models[i]->Transform.Scale.x, 0.0f, 100.0f);
-						ImGui::SliderFloat("Y Scale", &Models[i]->Transform.Scale.y, 0.0f, 100.0f);
-						ImGui::SliderFloat("Z Scale", &Models[i]->Transform.Scale.z, 0.0f, 100.0f);
-					}
-					ImGui::Unindent();
-					if (ImGui::Button("Reset"))
-					{
-						Models[i]->Transform.Position = Vector3::Zero();
-						Models[i]->Transform.Rotation = Vector3::Zero();
-						Models[i]->Transform.Scale = Vector3::One();
-					}
-					ImGui::SameLine();
-					if (ImGui::Button("Delete"))
-					{
-						DeleteModel(i);
-					}
+					ImGui::SliderFloat("X Scale", &Models[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
+					ImGui::SliderFloat("Y Scale", &Models[sceneSelectionIndex]->Transform.Scale.y, 0.0f, 100.0f);
+					ImGui::SliderFloat("Z Scale", &Models[sceneSelectionIndex]->Transform.Scale.z, 0.0f, 100.0f);
+				}
+
+				if (ImGui::Button("Reset"))
+				{
+					Models[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
+					Models[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
+					Models[sceneSelectionIndex]->Transform.Scale = Vector3::One();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Delete"))
+				{
+					DeleteModel(sceneSelectionIndex);
 				}
 			}
-
-			ImGui::Unindent();
-		}
-
-		if (ImGui::Button("Quit"))
-		{
-			exit(0);
+			else {
+				// An element is selected
+			}
 		}
 
 		verticalSpacing = ImVec2(0.0f, 10.0f); 
@@ -544,12 +604,17 @@ void GameManager::guiInteraction()
 
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
-			//saveModels(Models);
+			saveModels(Models);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
 		{
 			loadModels();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Quit", buttonSize))
+		{
+			exit(0);
 		}
 
 		// Reset the style
@@ -564,7 +629,7 @@ void GameManager::guiInteraction()
 //
 void GameManager::SpawnModel(string name)
 {
-	ModelLoader* objLoader = new ModelLoader(Constants::GetModelPath(name), Constants::GetTexturePath(name));
+	ModelLoader* objLoader = new ModelLoader(name);
 	//bool loaded = objLoader->loadObj(name);
 	//if (loaded)
 		Models.push_back(objLoader);
@@ -577,7 +642,7 @@ void GameManager::DeleteModel(int i)
 	delete obj;
 }
 
-void GameManager::saveModels(const std::vector<ObjLoader*>& models)
+void GameManager::saveModels(const std::vector<ModelLoader*>& models)
 {
 	std::ofstream file(Constants::SaveFileName, std::ios::binary | std::ios::trunc);
 
@@ -591,6 +656,7 @@ void GameManager::saveModels(const std::vector<ObjLoader*>& models)
 
 	// Write the name and transform of each model to the file
 	for (const auto& model : models) {
+		cout << model->Name << endl;
 		const std::string& modelName = model->Name;
 		const Transform& transform = model->Transform;
 
@@ -604,7 +670,7 @@ void GameManager::saveModels(const std::vector<ObjLoader*>& models)
 	file.close();
 }
 
-std::vector<ObjLoader*> GameManager::loadModels() {
+void GameManager::loadModels() {
 	std::ifstream file(Constants::SaveFileName, std::ios::binary);
 
 	if (!file) {
@@ -616,16 +682,14 @@ std::vector<ObjLoader*> GameManager::loadModels() {
 	file.read(reinterpret_cast<char*>(&numModels), sizeof(numModels));
 
 	// Read the name and transform of each model from the file
-	std::vector<ObjLoader*> models(numModels);
+	std::vector<ModelLoader*> models(numModels);
 	for (size_t i = 0; i < numModels; i++) {
 		// Read the name of the model from the file
 		std::string modelName;
 		std::getline(file, modelName, '\0');
 		cout << modelName;
 		// Create a new ObjLoader object and set its name
-		models[i] = new ObjLoader();
-		models[i]->loadObj(modelName);
-		models[i]->Name = modelName;
+		models[i] = new ModelLoader(modelName);
 
 		// Read the transform of the model from the file
 		Transform transform;
@@ -633,11 +697,10 @@ std::vector<ObjLoader*> GameManager::loadModels() {
 		cout << transform.Position.x;
 		// Set the transform of the model
 		models[i]->Transform = transform;
-		//Models.push_back(models[i]);
+		Models.push_back(models[i]);
 	}
 
 	file.close();
-	return models;
 }
 
 void GameManager::drawHUD(const std::string& text)

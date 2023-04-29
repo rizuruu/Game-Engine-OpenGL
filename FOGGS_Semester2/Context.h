@@ -17,7 +17,7 @@ The context holds all rendered objects, a single point to access the scene objec
 class Context {
 public:
 	GLfloat globalAmbient = 0.3f;
-	int isDogView = 0;
+	int isDogView = 1;
 	Camera camera;
 	Floor floor;
 	Dog dog;
