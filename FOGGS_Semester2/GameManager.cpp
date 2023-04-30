@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include <fstream>
 #include <imgui/imgui_internal.h>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 using namespace ImGui;
@@ -265,7 +267,6 @@ void GameManager::Display() {
 	//else
 	//	glutKeyboardFunc(keyboard);
 	// Draw the HUD text
-	drawHUD("Score: 100");
 	glutPostRedisplay();
 }
 
@@ -329,11 +330,9 @@ void GameManager::drawScene() {
 		glPopMatrix();
 	}
 
-	glPushMatrix();
-	//model->render();
-	glPopMatrix();
-
-	//g_objLoader.render();
+	glColor3f(0.0f, 1.0f, 1.0f);
+	drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
+	drawHUD(Constants::Combine("Editor Mode:", Constants::EditorMode), 0, 20);
 
 	//gContext.walls.draw({ 0, 1 });
 }
@@ -515,7 +514,7 @@ void GameManager::guiInteraction()
 
 			ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&gContext.pointlight.color));
 			ImGui::SliderFloat("pointlight source x", &gContext.pointlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("pointlight source y", &gContext.pointlight.position[1], -10.0f, 10.0f);
+			ImGui::SliderFloat("pointlight source y", &gContext.pointlight.position[1], 0.0f, 100.0f);
 			ImGui::SliderFloat("pointlight source z", &gContext.pointlight.position[2], -10.0f, 10.0f);
 
 			ImGui::Checkbox("enable spotlight", &spotlight);
@@ -703,56 +702,36 @@ void GameManager::loadModels() {
 	file.close();
 }
 
-void GameManager::drawHUD(const std::string& text)
+void GameManager::drawHUD(const char* text, float x, float y)
 {
-	// Save the current matrix mode
-	GLint matrixMode;
-	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-	// Switch to 2D mode
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), 0, -1, 1);
+	gluOrtho2D(0, windowWidth, 0, windowHeight);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 
-	// Disable lighting and depth testing
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-
-	// Enable blending for text rendering
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// Set the text color to white
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	// Set the text scale
-	glScalef(0.5f, 0.5f, 1.0f);
-
-	// Compute the text position to center it on the screen
-	int textWidth = glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)text.c_str());
-	int textHeight = 12;
-	int x = (glutGet(GLUT_WINDOW_WIDTH) - textWidth) / 2;
-	int y = (glutGet(GLUT_WINDOW_HEIGHT) - textHeight) / 2;
-
-	// Position the text
-	glTranslatef(x, y, 0.0f);
-
-	// Draw the text string using GLUT bitmap fonts
-	for (char c : text) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
+	int textWidth = 0;
+	for (const char* c = text; *c != '\0'; c++) {
+		textWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_18, *c);
 	}
 
-	// Disable blending
-	glDisable(GL_BLEND);
+	float offsetX = x;
+	float offsetY = y + 18; // Add the font height to the Y offset
 
-	// Restore the previous matrix mode
+	glColor3f(0.0f, 1.0f, 1.0f);
+	glRasterPos2f(offsetX, windowHeight - offsetY);
+	for (const char* c = text; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+	}
+
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-	glMatrixMode(matrixMode);
+	glMatrixMode(GL_MODELVIEW);
 }

@@ -50,7 +50,30 @@ public:
         }
         return n;
     }
+
+    template<typename T>
+    static const char* Combine(const std::string& st, T var)
+    {
+        static std::string text;
+
+        std::ostringstream stream;
+
+        if constexpr (std::is_same_v<T, bool>) {
+            stream << st << " " << (var ? "true" : "false");
+        }
+        else if constexpr (std::is_floating_point_v<T>) {
+            stream << st << " " << std::fixed << std::setprecision(2) << var;
+        }
+        else {
+            stream << var;
+        }
+
+        text = stream.str(); 
+
+        return text.c_str();
+    }
 };
+
 const std::string& Constants::SaveFileName = "EngineSaveData";
 
 // Colors

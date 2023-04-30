@@ -33,9 +33,8 @@ private:
 	void DeleteModel(int i);
 	void saveModels(const std::vector<ModelLoader*>& models);
 	void loadModels();
-	void drawHUD(const std::string& text);
+	void drawHUD(const char* text, float x, float y);
 	void guiInteraction();
-	void OnSliderValueChanged(float* pValue);
 	void mouse(int button, int state, int x, int y);
 	void drawScene();
 	void readFiles();
