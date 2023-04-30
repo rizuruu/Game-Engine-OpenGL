@@ -50,12 +50,12 @@ private:
 
 	// paths for the skybox textures
 	const char* skyboxFilenames[6] = {
-		"..\\Assets\\left.bmp",
-		"..\\Assets\\right.bmp",
-		"..\\Assets\\bottom.bmp",
-		"..\\Assets\\top.bmp",
-		"..\\Assets\\back.bmp",
-		"..\\Assets\\front.bmp"
+		"..\\Assets\\Skybox\\left.bmp",
+		"..\\Assets\\Skybox\\right.bmp",
+		"..\\Assets\\Skybox\\bottom.bmp",
+		"..\\Assets\\Skybox\\top.bmp",
+		"..\\Assets\\Skybox\\back.bmp",
+		"..\\Assets\\Skybox\\front.bmp"
 	};
 
 	float pitch = 0.0f;

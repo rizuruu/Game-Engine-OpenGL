@@ -46,12 +46,13 @@ void GameManager::Init(int argc, char** argv) {
 	//catch (const std::exception& e) {
 	//	std::cerr << "Error: " << e.what() << std::endl;
 	//}
-	if (!Constants::EditorMode)
+	if (Constants::EditorMode)
 	{
+
 	}
 	else
 	{
-		//glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+		glutSetCursor(GLUT_CURSOR_NONE);
 	}
 	
 	readFiles();
@@ -78,7 +79,7 @@ void GameManager::Init(int argc, char** argv) {
 
 	// Setup style
 	ImGui::StyleColorsClassic();
-
+	loadModels();
 	glutMainLoop();
 
 	// Cleanup
@@ -724,6 +725,7 @@ void GameManager::drawHUD(const char* text, float x, float y)
 	float offsetX = x;
 	float offsetY = y + 18; // Add the font height to the Y offset
 
+	glDisable(GL_LIGHTING);
 	glColor3f(0.0f, 1.0f, 1.0f);
 	glRasterPos2f(offsetX, windowHeight - offsetY);
 	for (const char* c = text; *c != '\0'; c++) {
@@ -734,4 +736,5 @@ void GameManager::drawHUD(const char* text, float x, float y)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_LIGHTING);
 }

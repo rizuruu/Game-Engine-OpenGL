@@ -41,8 +41,8 @@ void ModelLoader::render() {
 
     GLfloat color[4] = { 1.0, 1.0, 1.0 , 1.0 };
     glColor4fv(color);
-    GLfloat specular[] = { 1.0f, 1.0f, 1.0f },
-        shininess = 128.0f;
+    GLfloat specular[] = { 0.1f, 0.1f, 0.1f },
+        shininess = 0.1f;
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
