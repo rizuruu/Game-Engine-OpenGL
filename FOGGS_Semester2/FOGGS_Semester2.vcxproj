@@ -118,7 +118,6 @@
     <ClInclude Include="GLUTCallbacks.h" />
     <ClInclude Include="Mirror.h" />
     <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Snowman.h" />
     <ClInclude Include="Dog.h" />
@@ -147,7 +146,6 @@
     <ClCompile Include="Dog.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Snowman.cpp" />

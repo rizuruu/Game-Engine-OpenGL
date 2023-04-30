@@ -10,7 +10,6 @@
 #include "Skybox.h"
 #include <freeglut-3.0.0/src/fg_internal.h>
 #include "Skybox.h"
-#include "ObjLoader.h"
 #include <cstdint>
 #include "ModelLoader.h"
 
