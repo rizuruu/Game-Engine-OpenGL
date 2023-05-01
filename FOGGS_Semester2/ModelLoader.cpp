@@ -51,9 +51,13 @@ void ModelLoader::render() {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    glBegin(GL_TRIANGLES);
+    std::string lastMaterial = ""; // Add a variable to keep track of the last material
     for (const Face& face : faces) {
-        glBindTexture(GL_TEXTURE_2D, materialTextures[face.materialName]);
+        if (face.materialName != lastMaterial) { // Check if the material has changed
+            lastMaterial = face.materialName;
+            glBindTexture(GL_TEXTURE_2D, materialTextures[lastMaterial]);
+        }
+        glBegin(GL_TRIANGLES);
         for (int i = 0; i < 3; ++i) {
             const TexCoord& texCoord = texCoords[face.texCoordIndex[i]];
             const Vertex& vertex = vertices[face.vertexIndex[i]];
@@ -62,8 +66,9 @@ void ModelLoader::render() {
             glNormal3f(normal.x, normal.y, normal.z);  // Specify the vertex normal
             glVertex3f(vertex.x, vertex.y, vertex.z);
         }
+        glEnd();
+
     }
-    glEnd();
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
@@ -124,6 +129,7 @@ bool ModelLoader::loadObj(const std::string& filename) {
                 --face.texCoordIndex[i];
                 --face.normalIndex[i];  // Adjust indices to be zero-based
             }
+            std::cout << currentMaterial << std::endl;
             face.materialName = currentMaterial;
             faces.push_back(face);
         }
@@ -221,6 +227,9 @@ bool ModelLoader::loadMtl(const std::string& filename) {
                 materialTextures[currentMaterial] = textureID;
             }
         }
+    }
+    for (const auto& materialTexture : materialTextures) {
+        std::cout << "Material: " << materialTexture.first << ", Texture ID: " << materialTexture.second << std::endl;
     }
 
     mtlFile.close();
