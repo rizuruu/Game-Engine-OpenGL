@@ -29,15 +29,18 @@ private:
         GLuint vertexIndex[3];
         GLuint texCoordIndex[3];
         std::string materialName;  
-        // Replace materialIndex with materialName
+        int normalIndex[3];
+    };
+
+    struct Normal {
+        float x, y, z;
     };
 
     std::vector<Vertex> vertices;
     std::vector<TexCoord> texCoords;
     std::vector<Face> faces;
-
+    std::vector<Normal> normals;
     std::map<std::string, GLuint> materialTextures;
-    std::string currentMaterial;
     GLuint textureID;
 
     bool loadObj(const std::string& filename);

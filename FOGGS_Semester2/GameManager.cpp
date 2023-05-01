@@ -76,6 +76,9 @@ void GameManager::Init(int argc, char** argv) {
 	glEnable(GL_NORMALIZE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//
+	RoboPlayer = new Player();
+	
 	SkyboxRenderer = new Skybox(skyboxFilenames);
 	SkyboxRenderer->init();
 	gContext.pointlight.enable();
@@ -160,9 +163,9 @@ void GameManager::Display() {
 		float cameraZ = radius * cos(pitchRadians) * cos(yawRadians);
 
 		// Calculate the camera's target position
-		float targetX = gContext.dog.local[12];
-		float targetY = gContext.dog.local[13];
-		float targetZ = gContext.dog.local[14];
+		float targetX = RoboPlayer->Head->Transform.Position.x;
+		float targetY = RoboPlayer->Head->Transform.Position.y;
+		float targetZ = RoboPlayer->Head->Transform.Position.z;
 
 		// Add the position of the dog to the camera position
 		cameraX += targetX;
@@ -330,6 +333,8 @@ void GameManager::drawScene() {
 	//glPopMatrix();
 	//glEnable(GL_TEXTURE_2D);
 
+	RoboPlayer->Render();
+
 	for (int i = 0; i < Models.size(); i++)
 	{
 		glPushMatrix();
@@ -391,6 +396,7 @@ void GameManager::keyboard(unsigned char key, int, int)
 		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
+		//RoboPlayer->Move();
 		break;
 	case 'a':
 		gContext.dog.nextMove = []() { glRotatef(7, 0, 1, 0); };
