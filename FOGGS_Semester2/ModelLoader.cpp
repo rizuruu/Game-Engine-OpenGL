@@ -14,9 +14,9 @@ ModelLoader::ModelLoader(const std::string& modelName)
         std::cerr << "Failed to load OBJ file: " << GetModelPath(Name) << std::endl;
     }
 
-    if (!loadTexture(GetTexturePath(Name))) {
-        std::cerr << "Failed to load texture file: " << GetTexturePath(Name) << std::endl;
-    }
+    //if (!loadTexture(GetTexturePath(Name))) {
+    //    std::cerr << "Failed to load texture file: " << GetTexturePath(Name) << std::endl;
+    //}
 }
 
 ModelLoader::~ModelLoader() {
@@ -53,6 +53,7 @@ void ModelLoader::render() {
 
     glBegin(GL_TRIANGLES);
     for (const Face& face : faces) {
+        glBindTexture(GL_TEXTURE_2D, materialTextures[face.materialName]);
         for (int i = 0; i < 3; ++i) {
             const TexCoord& texCoord = texCoords[face.texCoordIndex[i]];
             const Vertex& vertex = vertices[face.vertexIndex[i]];
@@ -89,6 +90,26 @@ bool ModelLoader::loadObj(const std::string& filename) {
             lineStream >> texCoord.u >> texCoord.v;
             texCoords.push_back(texCoord);
         }
+        else if (type == "mtllib") {
+            std::string mtlFilename;
+            lineStream >> mtlFilename;
+            if (!loadMtl(GetMaterialPath(mtlFilename))) {
+                std::cerr << "Failed to load MTL file: " << GetMaterialPath(mtlFilename) << std::endl;
+
+                // Load single texture if MTL file loading failed
+                if (!loadTexture(GetTexturePath(Name))) {
+                    std::cerr << "Failed to load texture file: " << GetTexturePath(Name) << "Fallback to default material." << std::endl;
+                }
+                else {
+                    // Set the same texture for the default material
+                    materialTextures["default"] = textureID;
+                    currentMaterial = "default";
+                }
+            }
+        }
+        else if (type == "usemtl") {
+            lineStream >> currentMaterial;
+        }
         else if (type == "f") {
             Face face;
             char slash;
@@ -102,6 +123,7 @@ bool ModelLoader::loadObj(const std::string& filename) {
 
                 // ... (the rest of the function remains unchanged)
             }
+            face.materialName = currentMaterial;
             faces.push_back(face);
         }
     }
@@ -163,4 +185,38 @@ GLuint ModelLoader::createTexture(const unsigned char* data, int width, int heig
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return textureID;
+}
+
+bool ModelLoader::loadMtl(const std::string& filename) {
+    std::ifstream mtlFile(filename);
+
+    if (!mtlFile.is_open()) {
+        return false;
+    }
+
+    std::string line;
+    std::string currentMaterial;
+    while (std::getline(mtlFile, line)) {
+        std::istringstream lineStream(line);
+        std::string type;
+        lineStream >> type;
+
+        if (type == "newmtl") {
+            lineStream >> currentMaterial;
+        }
+        else if (type == "map_Kd") {
+            std::string textureName;
+            lineStream >> textureName;
+            std::string texturePath = GetTexturePath(textureName);
+            if (!loadTexture(texturePath)) {
+                std::cerr << "Failed to load texture file: " << texturePath << std::endl;
+            }
+            else {
+                materialTextures[currentMaterial] = textureID;
+            }
+        }
+    }
+
+    mtlFile.close();
+    return true;
 }

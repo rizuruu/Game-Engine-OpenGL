@@ -18,7 +18,13 @@ GameManager::GameManager(int argc, char** argv)
 
 GameManager::~GameManager()
 {
+	for (ModelLoader* model : Models) {
+		delete model;
+	}
+	Models.clear();
 
+	delete SkyboxRenderer;
+	delete customFont;
 }
 
 // Initialize Freeglut
@@ -79,7 +85,7 @@ void GameManager::Init(int argc, char** argv) {
 
 	// Setup style
 	ImGui::StyleColorsClassic();
-	loadModels();
+	//loadModels();
 	glutMainLoop();
 
 	// Cleanup

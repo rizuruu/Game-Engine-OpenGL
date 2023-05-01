@@ -5,6 +5,7 @@
 #include <string>
 #include <GL/freeglut.h>
 #include "Transform.h"
+#include <map>
 
 class ModelLoader {
 public:
@@ -27,16 +28,23 @@ private:
     struct Face {
         GLuint vertexIndex[3];
         GLuint texCoordIndex[3];
+        std::string materialName;  
+        // Replace materialIndex with materialName
     };
 
     std::vector<Vertex> vertices;
     std::vector<TexCoord> texCoords;
     std::vector<Face> faces;
+
+    std::map<std::string, GLuint> materialTextures;
+    std::string currentMaterial;
     GLuint textureID;
 
     bool loadObj(const std::string& filename);
     bool loadTexture(const std::string& filename);
     GLuint createTexture(const unsigned char* data, int width, int height);
+
+    bool loadMtl(const std::string& filename);
 
     // Paths
     const std::string GetModelPath(std::string Name)
@@ -45,7 +53,29 @@ private:
     }
     const std::string GetTexturePath(std::string Name)
     {
-        return "..\\Assets\\Textures\\" + Name + ".bmp";
+        return "..\\Assets\\Textures\\" + extractFileName(Name) + ".bmp";
+    }
+    const std::string GetMaterialPath(std::string Name)
+    {
+        return "..\\Assets\\Models\\" + Name;
+    }
+
+    std::string extractFileName(const std::string& filePath) {
+        size_t lastSlash = filePath.find_last_of("/\\");
+        size_t lastDot = filePath.find_last_of('.');
+
+        if (lastSlash == std::string::npos) {
+            lastSlash = 0; // No directory path found, start from the beginning
+        }
+        else {
+            lastSlash += 1; // Move past the last slash
+        }
+
+        if (lastDot == std::string::npos || lastDot < lastSlash) {
+            lastDot = filePath.size(); // No file extension found or before the last slash, use the whole string
+        }
+
+        return filePath.substr(lastSlash, lastDot - lastSlash);
     }
 };
 
