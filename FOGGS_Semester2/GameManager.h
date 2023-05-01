@@ -12,6 +12,7 @@
 #include "Skybox.h"
 #include <cstdint>
 #include "ModelLoader.h"
+#include "Player.h"
 
 using namespace std;
 using namespace ImGui;
@@ -73,5 +74,7 @@ private:
 	std::vector<std::string> files;
 	int importSelectionIndex = 0;
 	int sceneSelectionIndex = 0;
+
+	Player* RoboPlayer;
 };
 

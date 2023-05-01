@@ -57,7 +57,9 @@ void ModelLoader::render() {
         for (int i = 0; i < 3; ++i) {
             const TexCoord& texCoord = texCoords[face.texCoordIndex[i]];
             const Vertex& vertex = vertices[face.vertexIndex[i]];
+            const Normal& normal = normals[face.normalIndex[i]];  // Get the vertex normal
             glTexCoord2f(texCoord.u, texCoord.v);
+            glNormal3f(normal.x, normal.y, normal.z);  // Specify the vertex normal
             glVertex3f(vertex.x, vertex.y, vertex.z);
         }
     }
@@ -75,6 +77,7 @@ bool ModelLoader::loadObj(const std::string& filename) {
     }
 
     std::string line;
+    std::string currentMaterial;
     while (std::getline(objFile, line)) {
         std::istringstream lineStream(line);
         std::string type;
@@ -116,15 +119,18 @@ bool ModelLoader::loadObj(const std::string& filename) {
             int normalIndex;  // Add a variable to store the normal index
             for (int i = 0; i < 3; ++i) {
                 // Add another slash to the input stream extraction to handle the normal index
-                lineStream >> face.vertexIndex[i] >> slash >> face.texCoordIndex[i] >> slash >> normalIndex;
-                // Adjust indices to be zero-based
+                lineStream >> face.vertexIndex[i] >> slash >> face.texCoordIndex[i] >> slash >> face.normalIndex[i];
                 --face.vertexIndex[i];
                 --face.texCoordIndex[i];
-
-                // ... (the rest of the function remains unchanged)
+                --face.normalIndex[i];  // Adjust indices to be zero-based
             }
             face.materialName = currentMaterial;
             faces.push_back(face);
+        }
+        else if (type == "vn") {
+            Normal normal;
+            lineStream >> normal.x >> normal.y >> normal.z;
+            normals.push_back(normal);
         }
     }
 
