@@ -6,6 +6,7 @@
 #include <GL/freeglut.h>
 #include "Transform.h"
 #include <map>
+#include "Structs.h"
 
 class ModelLoader {
 public:
@@ -15,7 +16,7 @@ public:
     void render();
     Transform Transform;
     std::string Name;
-
+    Material Material;
 private:
     struct Vertex {
         GLfloat x, y, z;

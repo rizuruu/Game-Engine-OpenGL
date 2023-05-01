@@ -37,6 +37,7 @@ void GameManager::Init(int argc, char** argv) {
 	glutInitWindowSize(1200, 600);
 	glutCreateWindow(Constants::GameTitle);
 
+	glutTimerFunc(1000 / 60, GLUTCallbacks::Timer, 0);
 	glutDisplayFunc(GLUTCallbacks::Display);
 	// Setup ImGui binding
 	ImGui::CreateContext();
@@ -85,7 +86,6 @@ void GameManager::Init(int argc, char** argv) {
 	gContext.spotlight.enable();
 	gContext.dog.init();
 	//gContext.art.init();
-
 	// Setup style
 	ImGui::StyleColorsClassic();
 	//loadModels();
@@ -280,6 +280,11 @@ void GameManager::Display() {
 	glutPostRedisplay();
 }
 
+void GameManager::Update()
+{
+	glutTimerFunc(1000 / 60, GLUTCallbacks::Timer, 0);
+}
+
 //
 void GameManager::drawScene() {
 	SkyboxRenderer->draw();
@@ -306,32 +311,10 @@ void GameManager::drawScene() {
 
 	gContext.floor.draw();
 
-	glPushMatrix();
-	glMultMatrixf(gContext.dog.local);
-	gContext.dog.draw();
-	glPopMatrix();
-
 	//glPushMatrix();
-	//glTranslated(-3, 1.05, -3);
-	//gContext.table.draw();
+	//glMultMatrixf(gContext.dog.local);
+	//gContext.dog.draw();
 	//glPopMatrix();
-
-	//glPushMatrix();
-	//glTranslated(-2.2, 1.35, -3);
-	//gContext.teapot.draw();
-	//glPopMatrix();
-
-	//glPushMatrix();
-	//glTranslatef(-3.0f, 0, 3);
-	//glRotatef(90, 0, 1, 0);
-	//gContext.snowman.draw();
-	//glPopMatrix();
-
-	//glPushMatrix();
-	//glTranslated(1.0f, 1.5f, -4.99f);
-	//gContext.art.draw();
-	//glPopMatrix();
-	//glEnable(GL_TEXTURE_2D);
 
 	RoboPlayer->Render();
 
@@ -342,11 +325,9 @@ void GameManager::drawScene() {
 		glPopMatrix();
 	}
 
-	glColor3f(0.0f, 1.0f, 1.0f);
-	drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
+	if (Constants::EditorMode)
+		drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
 	drawHUD(Constants::Combine("Editor Mode:", Constants::EditorMode), 0, 20);
-
-	//gContext.walls.draw({ 0, 1 });
 }
 
 void GameManager::readFiles()
@@ -390,13 +371,14 @@ void GameManager::readFiles()
 //keyboard events handling
 void GameManager::keyboard(unsigned char key, int, int) 
 {
+	RoboPlayer->Update(tolower(key));
+
 	switch (tolower(key)) {
 	case 'w':
 		gContext.dog.nextMove = []() { glTranslated(0, 0, 0.2); };
 		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
-		//RoboPlayer->Move();
 		break;
 	case 'a':
 		gContext.dog.nextMove = []() { glRotatef(7, 0, 1, 0); };
@@ -617,11 +599,13 @@ void GameManager::guiInteraction()
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
 			saveModels(Models);
+			Constants::SaveLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
 		{
 			loadModels();
+			Constants::LoadLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Quit", buttonSize))

@@ -8,49 +8,49 @@ namespace GLUTCallbacks
 	namespace
 	{
 		// Initialise to a null pointer before we do anything
-		GameManager* helloGL = nullptr;
+		GameManager* gameManager = nullptr;
 	}
 
 	void Init(GameManager* gl)
 	{
-		helloGL = gl;
+		gameManager = gl;
 	}
 
 	void Display()
 	{
-		if (helloGL != nullptr)
+		if (gameManager != nullptr)
 		{
-			helloGL->Display();
+			gameManager->Display();
 		}
 	}
 
 	void Timer(int preferredRefresh)
 	{
-		if (helloGL != nullptr)
+		if (gameManager != nullptr)
 		{
-			//helloGL->Update();
+			gameManager->Update();
 		}
 	}
 
 	void Keyboard(unsigned char key, int x, int y)
 	{
-		if (helloGL != nullptr)
+		if (gameManager != nullptr)
 		{
-			helloGL->keyboard(key, x, y);
+			gameManager->keyboard(key, x, y);
 		}
 	}
 	void Motion(int x, int y)
 	{
-		if (helloGL != nullptr)
+		if (gameManager != nullptr)
 		{
-			helloGL->Motion(x, y);
+			gameManager->Motion(x, y);
 		}
 	}
 	void MouseWheel(int wheel, int direction, int x, int y)
 	{
-		if (helloGL != nullptr)
+		if (gameManager != nullptr)
 		{
-			helloGL->MouseWheel(wheel, direction, x, y);
+			gameManager->MouseWheel(wheel, direction, x, y);
 		}
 	}
 }

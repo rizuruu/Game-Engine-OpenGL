@@ -116,6 +116,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GLUTCallbacks.h" />
+    <ClInclude Include="Matrix3.h" />
     <ClInclude Include="Mirror.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Player.h" />
@@ -126,6 +127,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Spotlight.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Structs.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Teapot.h" />

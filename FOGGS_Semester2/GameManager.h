@@ -23,9 +23,10 @@ public:
 	GameManager(int argc, char** argv);
 	~GameManager();
 
-	void keyboard(unsigned char key, int, int);
-	void Display();
 	void Init(int argc, char** argv);
+	void Display();
+	void Update();
+	void keyboard(unsigned char key, int, int);
 	void Motion(int x, int y);
 	void MouseWheel(int wheel, int direction, int x, int y);
 private:

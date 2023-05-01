@@ -44,8 +44,8 @@ void ModelLoader::render() {
     GLfloat specular[] = { 0.1f, 0.1f, 0.1f },
         shininess = 0.1f;
 
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, Material.Specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, Material.Shine);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
     glEnable(GL_TEXTURE_2D);
