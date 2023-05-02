@@ -145,10 +145,6 @@ void GameManager::Display() {
 		glGetFloatv(GL_MODELVIEW_MATRIX, cameraPoseInDogView);
 		glLoadMatrixf(viewModelMatrix);
 
-		//Hack...
-		GLfloat zAngle = atan2(-cameraPoseInDogView[2], cameraPoseInDogView[0]);
-		GLfloat yAngle = atan2(-cameraPoseInDogView[9], cameraPoseInDogView[5]);
-
 		float radius = 10.0f; // Distance from camera to target
 		float pitchRadians = -pitch * 3.14159f / 180.0f;
 		float yawRadians = yaw * 3.14159f / 180.0f;
