@@ -34,8 +34,8 @@ public:
 private:
 	void SpawnModel(string name);
 	void DeleteModel(int i);
-	void saveModels(const std::vector<ModelLoader*>& models);
-	void loadModels();
+	void saveModels(const std::vector<ModelLoader*>& models, const PointLight& pointLight);
+	void loadScene(const std::string& filePath, std::vector<ModelLoader*>& models, PointLight& pointLight);
 	void drawHUD(const char* text, float x, float y);
 	void guiInteraction();
 	void mouse(int button, int state, int x, int y);

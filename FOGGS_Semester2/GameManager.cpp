@@ -594,14 +594,14 @@ void GameManager::guiInteraction()
 
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
-			saveModels(Models);
+			saveModels(Models, gContext.pointlight);
 			Constants::SaveLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
 		{
-			loadModels();
-			Constants::LoadLights(gContext.pointlight);
+			loadScene(Constants::SaveFileName, Models, gContext.pointlight);
+			//Constants::LoadLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Quit", buttonSize))
@@ -634,7 +634,7 @@ void GameManager::DeleteModel(int i)
 	delete obj;
 }
 
-void GameManager::saveModels(const std::vector<ModelLoader*>& models)
+void GameManager::saveModels(const std::vector<ModelLoader*>& models, const PointLight& pointLight)
 {
 	std::ofstream file(Constants::SaveFileName, std::ios::binary | std::ios::trunc);
 
@@ -642,6 +642,7 @@ void GameManager::saveModels(const std::vector<ModelLoader*>& models)
 		throw std::runtime_error("Error opening file for writing");
 	}
 
+	// Save models
 	// Write the number of models to the file
 	size_t numModels = models.size();
 	file.write(reinterpret_cast<const char*>(&numModels), sizeof(numModels));
@@ -659,38 +660,53 @@ void GameManager::saveModels(const std::vector<ModelLoader*>& models)
 		file.write(reinterpret_cast<const char*>(&transform), sizeof(Transform));
 	}
 
+	// Save light properties
+	// Write the color of the light
+	file.write(reinterpret_cast<const char*>(&pointLight.color), sizeof(pointLight.color));
+
+	// Write the position of the light
+	file.write(reinterpret_cast<const char*>(&pointLight.position), sizeof(pointLight.position));
+
 	file.close();
 }
 
-void GameManager::loadModels() {
-	std::ifstream file(Constants::SaveFileName, std::ios::binary);
+void GameManager::loadScene(const std::string& filePath, std::vector<ModelLoader*>& models, PointLight& pointLight)
+{
+	std::ifstream file(filePath, std::ios::binary);
 
 	if (!file) {
 		throw std::runtime_error("Error opening file for reading");
 	}
 
+	// Load models
 	// Read the number of models from the file
-	size_t numModels;
+	size_t numModels = 0;
 	file.read(reinterpret_cast<char*>(&numModels), sizeof(numModels));
 
+	models.clear();
+
 	// Read the name and transform of each model from the file
-	std::vector<ModelLoader*> models(numModels);
-	for (size_t i = 0; i < numModels; i++) {
-		// Read the name of the model from the file
+	for (size_t i = 0; i < numModels; ++i) {
+		// Read the name of the model
 		std::string modelName;
 		std::getline(file, modelName, '\0');
-		cout << modelName;
-		// Create a new ObjLoader object and set its name
-		models[i] = new ModelLoader(modelName);
 
-		// Read the transform of the model from the file
+		// Read the transform of the model
 		Transform transform;
 		file.read(reinterpret_cast<char*>(&transform), sizeof(Transform));
-		cout << transform.Position.x;
-		// Set the transform of the model
-		models[i]->Transform = transform;
-		Models.push_back(models[i]);
+
+		// Create a ModelLoader object with the loaded data and add it to the models vector
+		ModelLoader* model = new ModelLoader(modelName);
+		model->Transform = transform;
+		models.push_back(model);
 	}
+
+	// Load light properties
+	// Read the color of the light
+	file.read(reinterpret_cast<char*>(&pointLight.color), sizeof(pointLight.color));
+
+	// Read the position of the light
+	file.read(reinterpret_cast<char*>(&pointLight.position), sizeof(pointLight.position));
 
 	file.close();
 }
