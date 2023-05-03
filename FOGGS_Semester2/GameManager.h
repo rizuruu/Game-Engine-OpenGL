@@ -26,7 +26,9 @@ public:
 	void Init(int argc, char** argv);
 	void Display();
 	void Update();
-	void keyboard(unsigned char key, int, int);
+	void Keyboard(unsigned char key, int, int);
+	void GameInput(unsigned char key);
+	void EditorInput(unsigned char key);
 	void Motion(int x, int y);
 	void MouseWheel(int wheel, int direction, int x, int y);
 private:

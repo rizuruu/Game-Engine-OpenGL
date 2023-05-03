@@ -80,8 +80,7 @@ void GameManager::Init(int argc, char** argv) {
 	//
 	RoboPlayer = new Player();
 	
-	SkyboxRenderer = new Skybox(skyboxFilenames);
-	SkyboxRenderer->init();
+	SkyboxRenderer = new Skybox(SkyType::Spherical);
 	gContext.pointlight.enable();
 	gContext.spotlight.enable();
 	gContext.dog.init();
@@ -116,6 +115,7 @@ void GameManager::Display() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(Constants::FOV, io.DisplaySize.x / io.DisplaySize.y, Constants::NearClippingPlane, Constants::FarClippingPlane);
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -307,12 +307,8 @@ void GameManager::drawScene() {
 
 	gContext.floor.draw();
 
-	//glPushMatrix();
-	//glMultMatrixf(gContext.dog.local);
-	//gContext.dog.draw();
-	//glPopMatrix();
-
-	RoboPlayer->Render();
+	if (!Constants::EditorMode)
+		RoboPlayer->Render();
 
 	for (int i = 0; i < Models.size(); i++)
 	{
@@ -358,48 +354,51 @@ void GameManager::readFiles()
 		closedir(dir);
 	}
 #endif
-
-	for (const auto& file : files) {
-		std::cout << file << std::endl;
-	}
 }
 
 //keyboard events handling
-void GameManager::keyboard(unsigned char key, int, int) 
+void GameManager::Keyboard(unsigned char key, int, int) 
+{
+	if (Constants::EditorMode)
+		EditorInput(key);
+	else
+		GameInput(key);
+
+	glutPostRedisplay();
+}
+
+void GameManager::GameInput(unsigned char key)
 {
 	RoboPlayer->Update(tolower(key));
+}
 
+void GameManager::EditorInput(unsigned char key)
+{
 	switch (tolower(key)) {
 	case 'w':
-		gContext.dog.nextMove = []() { glTranslated(0, 0, 0.2); };
 		gContext.camera.position[0] += sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[1] += sin(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] += cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'a':
-		gContext.dog.nextMove = []() { glRotatef(7, 0, 1, 0); };
 		gContext.camera.position[0] += cos(yaw * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] -= sin(yaw * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 's':
-		gContext.dog.nextMove = []() { glTranslated(0, 0, -0.2); };
 		gContext.camera.position[0] -= sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[1] -= sin(pitch * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] -= cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'd':
-		gContext.dog.nextMove = []() { glRotatef(-7, 0, 1, 0); };
 		gContext.camera.position[0] -= cos(yaw * M_PI / 180.0f) * freeLookSpeed;
 		gContext.camera.position[2] += sin(yaw * M_PI / 180.0f) * freeLookSpeed;
 		break;
 	case 'p':
 		freeLook = !freeLook;
 		break;
-		// Handle other key presses
 	default:
 		break;
 	}
-	glutPostRedisplay();
 }
 
 //
@@ -498,6 +497,7 @@ void GameManager::guiInteraction()
 
 		static bool pointlight = true;
 		static bool spotlight = true;
+		ImGui::SliderFloat("FOV", &Constants::FOV, 0.0f, 100.0f);
 		if (ImGui::CollapsingHeader("Lights"))
 		{
 			ImGui::SliderFloat("ambient light adjust", &gContext.globalAmbient, 0.0f, 1.0f);

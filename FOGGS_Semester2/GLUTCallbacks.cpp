@@ -36,7 +36,7 @@ namespace GLUTCallbacks
 	{
 		if (gameManager != nullptr)
 		{
-			gameManager->keyboard(key, x, y);
+			gameManager->Keyboard(key, x, y);
 		}
 	}
 	void Motion(int x, int y)

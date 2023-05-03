@@ -129,7 +129,6 @@ bool ModelLoader::loadObj(const std::string& filename) {
                 --face.texCoordIndex[i];
                 --face.normalIndex[i];  // Adjust indices to be zero-based
             }
-            std::cout << currentMaterial << std::endl;
             face.materialName = currentMaterial;
             faces.push_back(face);
         }
@@ -187,8 +186,8 @@ GLuint ModelLoader::createTexture(const unsigned char* data, int width, int heig
     // Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812f);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812f);
 
     // Upload texture data
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, 0x80E0, GL_UNSIGNED_BYTE, data);
@@ -227,9 +226,6 @@ bool ModelLoader::loadMtl(const std::string& filename) {
                 materialTextures[currentMaterial] = textureID;
             }
         }
-    }
-    for (const auto& materialTexture : materialTextures) {
-        std::cout << "Material: " << materialTexture.first << ", Texture ID: " << materialTexture.second << std::endl;
     }
 
     mtlFile.close();

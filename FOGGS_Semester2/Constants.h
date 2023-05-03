@@ -12,7 +12,7 @@ public:
     static const std::string& SaveFileName;
 
     // Camera Constants
-    static const float FOV;
+    static float FOV;
     static const float NearClippingPlane;
     static const float FarClippingPlane;
 
@@ -120,6 +120,6 @@ const ImVec4 Constants::ButtonColor = ImVec4(0.1, 0.1, 0.1, 0.8f);
 const ImVec4 Constants::ButtonHoverColor = ImVec4(0.129, 0.129, 0.129, 0.8f);
 
 // Camera Constants
-const float Constants::FOV = 40.0f;
+ float Constants::FOV = 40.0f;
 const float Constants::NearClippingPlane = 1.0f;
-const float Constants::FarClippingPlane = 3500.0f;
+const float Constants::FarClippingPlane = 13500.0f;
