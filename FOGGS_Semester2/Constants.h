@@ -2,6 +2,8 @@
 #include <string>
 #include <imgui/imgui.h>
 #include <fstream>
+#include <windows.h>
+#include <commdlg.h>
 
 class Constants {
 public:
@@ -110,6 +112,62 @@ public:
 
         file.close();
         return true;
+    }
+
+    static std::string wstringToString(const std::wstring& wstr)
+    {
+        int size = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+        std::string result(size, 0);
+        WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &result[0], size, NULL, NULL);
+        return result;
+    }
+
+    static std::string openFileDialog()
+    {
+        OPENFILENAME ofn;
+        wchar_t fileName[MAX_PATH] = L"";
+        ZeroMemory(&ofn, sizeof(ofn));
+
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = NULL; // Set this to your application's window handle if available
+        ofn.lpstrFilter = L"Scene Files\0*.scene\0All Files\0*.*\0";
+        ofn.lpstrFile = fileName;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+        ofn.lpstrDefExt = L"scene";
+
+        if (GetOpenFileName(&ofn))
+        {
+            return wstringToString(fileName);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    static std::string saveFileDialog()
+    {
+        OPENFILENAME ofn;
+        wchar_t fileName[MAX_PATH] = L"";
+        ZeroMemory(&ofn, sizeof(ofn));
+
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = NULL; // Set this to your application's window handle if available
+        ofn.lpstrFilter = L"Scene Files\0*.scene\0All Files\0*.*\0";
+        ofn.lpstrFile = fileName;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY;
+        ofn.lpstrDefExt = L"scene";
+
+        if (GetSaveFileName(&ofn))
+        {
+            return wstringToString(fileName);
+        }
+        else
+        {
+            return "";
+        }
     }
 };
 

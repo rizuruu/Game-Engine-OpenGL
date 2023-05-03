@@ -498,6 +498,12 @@ void GameManager::guiInteraction()
 		static bool pointlight = true;
 		static bool spotlight = true;
 		ImGui::SliderFloat("FOV", &Constants::FOV, 0.0f, 100.0f);
+		if (ImGui::Button("Import HDRI", fullSizeButton))
+		{
+			string filepath = Constants::openFileDialog();
+			std::cout << filepath << std::endl;
+			//SkyboxRenderer->SkySphere->loadTexture(filepath);
+		}
 		if (ImGui::CollapsingHeader("Lights"))
 		{
 			ImGui::SliderFloat("ambient light adjust", &gContext.globalAmbient, 0.0f, 1.0f);
@@ -594,13 +600,18 @@ void GameManager::guiInteraction()
 
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
-			saveModels(Models, gContext.pointlight);
-			Constants::SaveLights(gContext.pointlight);
+			std::string filePath = Constants::saveFileDialog();
+			if (!filePath.empty()) {
+				saveModels(Models, gContext.pointlight, filePath);
+			}
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
 		{
-			loadScene(Constants::SaveFileName, Models, gContext.pointlight);
+			std::string filePath = Constants::openFileDialog();
+			if (!filePath.empty()) {
+				loadScene(filePath, Models, gContext.pointlight);
+			}
 			//Constants::LoadLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
@@ -634,9 +645,9 @@ void GameManager::DeleteModel(int i)
 	delete obj;
 }
 
-void GameManager::saveModels(const std::vector<ModelLoader*>& models, const PointLight& pointLight)
+void GameManager::saveModels(const std::vector<ModelLoader*>& models, const PointLight& pointLight, const std::string& filePath)
 {
-	std::ofstream file(Constants::SaveFileName, std::ios::binary | std::ios::trunc);
+	std::ofstream file(filePath, std::ios::binary | std::ios::trunc);
 
 	if (!file) {
 		throw std::runtime_error("Error opening file for writing");
