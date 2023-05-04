@@ -159,20 +159,10 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 				ImGui::Text("Transform");
 				if (ImGui::CollapsingHeader("Position"))
 				{
-					float position = gContext.GameObjects[sceneSelectionIndex]->Transform.Position.x;
 					ImGui::SliderFloat3("Position", &gContext.GameObjects[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
-					//ImGui::SliderFloat("Y Position", &gContext.GameObjects[sceneSelectionIndex]->Transform.Position.y, -10.0f, 10.0f);
-					//ImGui::SliderFloat("Z Position", &gContext.GameObjects[sceneSelectionIndex]->Transform.Position.z, -10.0f, 10.0f);
 				}
 				if (ImGui::CollapsingHeader("Rotation"))
 				{
-					float rotation = gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.x;
-					if (ImGui::SliderFloat("All Rotation", &rotation, 0.0f, 360.0f, "%.2f", 2.0f))
-					{
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.x = rotation;
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.y = rotation;
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.z = rotation;
-					}
 					ImGui::SliderFloat3("Rotation", &gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
 				}
 				if (ImGui::CollapsingHeader("Scale"))
