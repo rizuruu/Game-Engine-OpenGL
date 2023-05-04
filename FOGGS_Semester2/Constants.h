@@ -5,7 +5,6 @@
 #include <iostream>
 #include <windows.h>
 #include <commdlg.h>
-#include "PointLight.h"
 
 class Constants {
 public:
@@ -76,44 +75,6 @@ public:
         text = stream.str(); 
 
         return text.c_str();
-    }
-
-    // Saving
-    static bool SaveLights(const PointLight& pointLight)
-    {
-        std::ofstream file("SceneLightsData", std::ios::binary | std::ios::trunc);
-
-        if (!file) {
-            std::cerr << "Error opening file for writing" << std::endl;
-            return false;
-        }
-
-        // Write the color of the light
-        file.write(reinterpret_cast<const char*>(&pointLight.color), sizeof(pointLight.color));
-
-        // Write the position of the light
-        file.write(reinterpret_cast<const char*>(&pointLight.position), sizeof(pointLight.position));
-
-        file.close();
-        return true;
-    }
-    static bool LoadLights(PointLight& pointLight)
-    {
-        std::ifstream file("SceneLightsData", std::ios::binary);
-
-        if (!file) {
-            std::cerr << "Error opening file for reading" << std::endl;
-            return false;
-        }
-
-        // Read the color of the light
-        file.read(reinterpret_cast<char*>(&pointLight.color), sizeof(pointLight.color));
-
-        // Read the position of the light
-        file.read(reinterpret_cast<char*>(&pointLight.position), sizeof(pointLight.position));
-
-        file.close();
-        return true;
     }
 
     static std::string wstringToString(const std::wstring& wstr)

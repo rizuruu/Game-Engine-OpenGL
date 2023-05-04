@@ -2,6 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cerrno>
+#include <cstring>
+#include <filesystem>
 
 ModelLoader::ModelLoader(const std::string& modelName)
     : textureID(0), Name(modelName) {  // Initialize textureID to 0
@@ -9,7 +12,7 @@ ModelLoader::ModelLoader(const std::string& modelName)
     Transform.Scale.x = 1.0;
     Transform.Scale.y = 1.0;
     Transform.Scale.z = 1.0;
-
+    std::cout << modelName << std::endl;
     if (!loadObj(GetModelPath(Name))) {
         std::cerr << "Failed to load OBJ file: " << GetModelPath(Name) << std::endl;
     }
@@ -75,12 +78,14 @@ void ModelLoader::render() {
 }
 
 bool ModelLoader::loadObj(const std::string& filename) {
+
     std::ifstream objFile(filename);
 
     if (!objFile.is_open()) {
+        std::cerr << "Error opening file: " << std::strerror(errno) << std::endl;
         return false;
     }
-
+    std::cout << "going ahead" << std::endl;
     std::string line;
     std::string currentMaterial;
     while (std::getline(objFile, line)) {

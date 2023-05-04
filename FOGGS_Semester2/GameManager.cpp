@@ -18,10 +18,10 @@ GameManager::GameManager(int argc, char** argv)
 
 GameManager::~GameManager()
 {
-	for (ModelLoader* model : Models) {
+	/*for (ModelLoader* model : Models) {
 		delete model;
 	}
-	Models.clear();
+	Models.clear();*/
 
 	delete SkyboxRenderer;
 	delete customFont;
@@ -63,7 +63,6 @@ void GameManager::Init(int argc, char** argv) {
 		glutSetCursor(GLUT_CURSOR_NONE);
 	}
 	
-	readFiles();
 
 	glutKeyboardFunc((void(*)(unsigned char, int, int))GLUTCallbacks::Keyboard);
 	glutPassiveMotionFunc(GLUTCallbacks::Motion);
@@ -80,11 +79,11 @@ void GameManager::Init(int argc, char** argv) {
 
 	//
 	RoboPlayer = new Player();
-	EditorGUIRenderer = new EditorGUI();
+	EditorGUIRenderer = new EditorGUI(gContext);
 	SkyboxRenderer = new Skybox(SkyType::Spherical);
 	gContext.pointlight.enable();
 	gContext.spotlight.enable();
-	gContext.dog.init();
+
 	//gContext.art.init();
 	// Setup style
 	ImGui::StyleColorsClassic();
@@ -122,32 +121,8 @@ void GameManager::Display() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//update the dog's transformation matrix
-	if (gContext.dog.nextMove) {
-		gContext.dog.isMoving = true;
-		GLfloat viewModelMatrix[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, viewModelMatrix);
-		glLoadMatrixf(gContext.dog.local);
-		gContext.dog.nextMove();
-		gContext.dog.nextMove = nullptr;
-		glGetFloatv(GL_MODELVIEW_MATRIX, gContext.dog.local);
-		glLoadMatrixf(viewModelMatrix);
-	}
-
 	//change viewing mode if in Doggy view setup
 	if (!Constants::EditorMode) {
-		GLfloat viewModelMatrix[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, viewModelMatrix);
-		glLoadMatrixf(gContext.dog.local);
-
-		glRotatef(gContext.dog.headVerticalAngle, 1, 0, 0);
-		glRotatef(gContext.dog.headHorizontalAngle, 0, 1, 0);
-		glTranslated(0, 0.75, 0.9);
-
-		GLfloat cameraPoseInDogView[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, cameraPoseInDogView);
-		glLoadMatrixf(viewModelMatrix);
-
 		float radius = 10.0f; // Distance from camera to target
 		float pitchRadians = -pitch * 3.14159f / 180.0f;
 		float yawRadians = yaw * 3.14159f / 180.0f;
@@ -313,50 +288,16 @@ void GameManager::drawScene() {
 	if (!Constants::EditorMode)
 		RoboPlayer->Render();
 
-	for (int i = 0; i < Models.size(); i++)
+	for (int i = 0; i < gContext.GameObjects.size(); i++)
 	{
 		glPushMatrix();
-		Models[i]->render();
+		gContext.GameObjects[i]->render();
 		glPopMatrix();
 	}
 
 	//if (Constants::EditorMode)
 	//	drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
 	//drawHUD(Constants::Combine("Editor Mode:", Constants::EditorMode), 0, 20);
-}
-
-void GameManager::readFiles()
-{
-	files.clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAA fileData;
-	HANDLE hFind = FindFirstFileA((path + "*").c_str(), &fileData);
-
-	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
-			if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				std::string filename = fileData.cFileName;
-				if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
-					files.push_back(filename);
-				}
-			}
-		} while (FindNextFileA(hFind, &fileData));
-		FindClose(hFind);
-	}
-#else
-	DIR* dir = opendir(path.c_str());
-
-	if (dir != nullptr) {
-		dirent* entry;
-		while ((entry = readdir(dir)) != nullptr) {
-			std::string filename = entry->d_name;
-			if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
-				files.push_back(filename);
-			}
-		}
-		closedir(dir);
-	}
-#endif
 }
 
 //keyboard events handling
@@ -471,261 +412,8 @@ void GameManager::guiInteraction()
 {
 	ImGuiWindowFlags window_flags = 0;
 	EditorGUIRenderer->Render();
-	if (ImGui::Begin("My Scene Properties", false))
-	{
-		//ImGui::RadioButton("external view", &gContext.isDogView, 0); ImGui::SameLine();
-		//ImGui::RadioButton("doggy view", &gContext.isDogView, 1);
-
-		ImGui::Text("Select Model to import:");
-		ImGui::SameLine();
-		if (ImGui::Button("Refresh"))
-		{
-			readFiles();
-		}
-
-		ImGui::ListBox("", &importSelectionIndex,
-			[](void* data, int index, const char** out_text) {
-				*out_text = (*(std::vector<std::string>*)data)[index].c_str();
-				return true;
-			}, (void*)&files, files.size());
-
-		float fullWidth = ImGui::GetContentRegionAvailWidth();
-		ImVec2 fullSizeButton(fullWidth, 20); 
-		if (ImGui::Button("IMPORT", fullSizeButton))
-		{
-			cout << Constants::NameWithoutExt(files[importSelectionIndex]) << endl;
-
-			SpawnModel(Constants::NameWithoutExt(files[importSelectionIndex]));
-		}
-
-		ImVec2 verticalSpacing(0.0f, 10.0f); 
-		ImGui::Dummy(verticalSpacing);
-
-		static bool pointlight = true;
-		static bool spotlight = true;
-		ImGui::SliderFloat("FOV", &Constants::FOV, 0.0f, 100.0f);
-		if (ImGui::Button("Import HDRI", fullSizeButton))
-		{
-			//string filepath = Constants::openFileDialog();
-			//std::cout << filepath << std::endl;
-			//SkyboxRenderer->SkySphere->loadTexture(filepath);
-		}
-		if (ImGui::CollapsingHeader("Lights"))
-		{
-			ImGui::SliderFloat("ambient light adjust", &gContext.globalAmbient, 0.0f, 1.0f);
-			ImGui::Checkbox("enable pointlight", &pointlight);
-
-			ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&gContext.pointlight.color));
-			ImGui::SliderFloat("pointlight source x", &gContext.pointlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("pointlight source y", &gContext.pointlight.position[1], 0.0f, 100.0f);
-			ImGui::SliderFloat("pointlight source z", &gContext.pointlight.position[2], -10.0f, 10.0f);
-
-			ImGui::Checkbox("enable spotlight", &spotlight);
-			ImGui::ColorEdit3("spotlight color", reinterpret_cast<float*>(&gContext.spotlight.color));
-			ImGui::SliderFloat("spotlight source x", &gContext.spotlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source y", &gContext.spotlight.position[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source z", &gContext.spotlight.position[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target x", &gContext.spotlight.target[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target y", &gContext.spotlight.target[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target z", &gContext.spotlight.target[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight cutoff", &gContext.spotlight.cutoff, 0.0f, 90.0f);
-			ImGui::SliderFloat("spotlight exponent", &gContext.spotlight.exponent, 0.0f, 90.0f);
-
-			pointlight ? gContext.pointlight.enable() : gContext.pointlight.disable();
-			spotlight ? gContext.spotlight.enable() : gContext.spotlight.disable();
-		}
-
-		if (ImGui::CollapsingHeader("Scene Hierarchy")) {
-			ImGui::Text("Scene");
-			// Display the list of model names using ImGui::ListBox()
-			ImGui::ListBox(".", &sceneSelectionIndex,
-				[](void* data, int index, const char** out_text) {
-					std::vector<ModelLoader*>* models = (std::vector<ModelLoader*>*)data;
-					*out_text = (*models)[index]->Name.c_str();
-					return true;
-				}, &Models, Models.size());
-
-			ImGui::Indent();
-
-			if (Models.size() != 0 && sceneSelectionIndex != -1) {
-				ImGui::Text("Transform");
-				if (ImGui::CollapsingHeader("Position"))
-				{
-					ImGui::SliderFloat("X Position", &Models[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
-					ImGui::SliderFloat("Y Position", &Models[sceneSelectionIndex]->Transform.Position.y, -10.0f, 10.0f);
-					ImGui::SliderFloat("Z Position", &Models[sceneSelectionIndex]->Transform.Position.z, -10.0f, 10.0f);
-				}
-				if (ImGui::CollapsingHeader("Rotation"))
-				{
-					ImGui::SliderFloat("X Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
-					ImGui::SliderFloat("Y Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.y, 0.0f, 360.0f);
-					ImGui::SliderFloat("Z Rotation", &Models[sceneSelectionIndex]->Transform.Rotation.z, 0.0f, 360.0f);
-				}
-				if (ImGui::CollapsingHeader("Scale"))
-				{
-					float scale = Models[sceneSelectionIndex]->Transform.Scale.x;
-					if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f, "%.2f", 2.0f))
-					{
-						Models[sceneSelectionIndex]->Transform.Scale.x = scale;
-						Models[sceneSelectionIndex]->Transform.Scale.y = scale;
-						Models[sceneSelectionIndex]->Transform.Scale.z = scale;
-					}
-					ImGui::SliderFloat("X Scale", &Models[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
-					ImGui::SliderFloat("Y Scale", &Models[sceneSelectionIndex]->Transform.Scale.y, 0.0f, 100.0f);
-					ImGui::SliderFloat("Z Scale", &Models[sceneSelectionIndex]->Transform.Scale.z, 0.0f, 100.0f);
-				}
-
-				if (ImGui::Button("Reset"))
-				{
-					Models[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
-					Models[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
-					Models[sceneSelectionIndex]->Transform.Scale = Vector3::One();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Delete"))
-				{
-					DeleteModel(sceneSelectionIndex);
-				}
-			}
-			else {
-				// An element is selected
-			}
-		}
-
-		verticalSpacing = ImVec2(0.0f, 10.0f); 
-		ImGui::Dummy(verticalSpacing);
-
-		// Set the desired button size
-		ImVec2 buttonSize(150, 30); 
-
-		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
-
-		//ImGui::PushStyleColor(ImGuiCol_Button, Constants::ButtonColor);
-
-		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Constants::ButtonHoverColor);
-
-		if (ImGui::Button("Save Scene", buttonSize))
-		{
-			/*std::string filePath = Constants::saveFileDialog();
-			if (!filePath.empty()) {
-				saveModels(Models, gContext.pointlight, filePath);
-			}*/
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Load Scene", buttonSize))
-		{
-			/*std::string filePath = Constants::openFileDialog();
-			if (!filePath.empty()) {
-				loadScene(filePath, Models, gContext.pointlight);
-			}*/
-			//Constants::LoadLights(gContext.pointlight);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Quit", buttonSize))
-		{
-			exit(0);
-		}
-
-		// Reset the style
-		ImGui::PopStyleVar();
-		//ImGui::PopStyleColor();
-		//ImGui::PopStyleColor();
-	}
-	ImGui::End();
+	EditorGUIRenderer->PropertiesWindow(gContext);
 	//ImGui::PopStyleColor();
-}
-
-//
-void GameManager::SpawnModel(string name)
-{
-	ModelLoader* objLoader = new ModelLoader(name);
-	//bool loaded = objLoader->loadObj(name);
-	//if (loaded)
-		Models.push_back(objLoader);
-}
-
-void GameManager::DeleteModel(int i)
-{
-	ModelLoader* obj = Models[i];
-	Models.erase(Models.begin() + i); 
-	delete obj;
-}
-
-void GameManager::saveModels(const std::vector<ModelLoader*>& models, const PointLight& pointLight, const std::string& filePath)
-{
-	std::ofstream file(filePath, std::ios::binary | std::ios::trunc);
-
-	if (!file) {
-		throw std::runtime_error("Error opening file for writing");
-	}
-
-	// Save models
-	// Write the number of models to the file
-	size_t numModels = models.size();
-	file.write(reinterpret_cast<const char*>(&numModels), sizeof(numModels));
-
-	// Write the name and transform of each model to the file
-	for (const auto& model : models) {
-		cout << model->Name << endl;
-		const std::string& modelName = model->Name;
-		const Transform& transform = model->Transform;
-
-		// Write the name of the model
-		file.write(modelName.c_str(), modelName.length() + 1);
-
-		// Write the transform of the model
-		file.write(reinterpret_cast<const char*>(&transform), sizeof(Transform));
-	}
-
-	// Save light properties
-	// Write the color of the light
-	file.write(reinterpret_cast<const char*>(&pointLight.color), sizeof(pointLight.color));
-
-	// Write the position of the light
-	file.write(reinterpret_cast<const char*>(&pointLight.position), sizeof(pointLight.position));
-
-	file.close();
-}
-
-void GameManager::loadScene(const std::string& filePath, std::vector<ModelLoader*>& models, PointLight& pointLight)
-{
-	std::ifstream file(filePath, std::ios::binary);
-
-	if (!file) {
-		throw std::runtime_error("Error opening file for reading");
-	}
-
-	// Load models
-	// Read the number of models from the file
-	size_t numModels = 0;
-	file.read(reinterpret_cast<char*>(&numModels), sizeof(numModels));
-
-	models.clear();
-
-	// Read the name and transform of each model from the file
-	for (size_t i = 0; i < numModels; ++i) {
-		// Read the name of the model
-		std::string modelName;
-		std::getline(file, modelName, '\0');
-
-		// Read the transform of the model
-		Transform transform;
-		file.read(reinterpret_cast<char*>(&transform), sizeof(Transform));
-
-		// Create a ModelLoader object with the loaded data and add it to the models vector
-		ModelLoader* model = new ModelLoader(modelName);
-		model->Transform = transform;
-		models.push_back(model);
-	}
-
-	// Load light properties
-	// Read the color of the light
-	file.read(reinterpret_cast<char*>(&pointLight.color), sizeof(pointLight.color));
-
-	// Read the position of the light
-	file.read(reinterpret_cast<char*>(&pointLight.position), sizeof(pointLight.position));
-
-	file.close();
 }
 
 void GameManager::drawHUD(const char* text, float x, float y)
