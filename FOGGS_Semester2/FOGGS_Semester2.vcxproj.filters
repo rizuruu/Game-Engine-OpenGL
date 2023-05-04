@@ -71,6 +71,7 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EditorGUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Art.h">
@@ -166,6 +167,9 @@
     <ClInclude Include="Structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IconsFontAwesome.h" />
+    <ClInclude Include="ImGuiUtils.h" />
+    <ClInclude Include="EditorGUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

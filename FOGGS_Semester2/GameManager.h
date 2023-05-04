@@ -13,6 +13,7 @@
 #include <cstdint>
 #include "ModelLoader.h"
 #include "Player.h"
+#include "EditorGUI.h"
 
 using namespace std;
 using namespace ImGui;
@@ -79,5 +80,7 @@ private:
 	int sceneSelectionIndex = 0;
 
 	Player* RoboPlayer;
+	ImFont* largerFont;
+	EditorGUI* EditorGUIRenderer;
 };
 

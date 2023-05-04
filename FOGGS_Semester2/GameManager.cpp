@@ -42,10 +42,10 @@ void GameManager::Init(int argc, char** argv) {
 	glutDisplayFunc(GLUTCallbacks::Display);
 	// Setup ImGui binding
 	ImGui::CreateContext();
-
 	ImGui_ImplFreeGLUT_Init();
 	ImGui_ImplFreeGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
+
 	// Load the model and texture
 	//try {
 	//	model = new ModelLoader("model");
@@ -80,7 +80,7 @@ void GameManager::Init(int argc, char** argv) {
 
 	//
 	RoboPlayer = new Player();
-	
+	EditorGUIRenderer = new EditorGUI();
 	SkyboxRenderer = new Skybox(SkyType::Spherical);
 	gContext.pointlight.enable();
 	gContext.spotlight.enable();
@@ -100,6 +100,8 @@ void GameManager::Init(int argc, char** argv) {
 //display handling, rendering all objects
 void GameManager::Display() {
 	//imgui new frame
+	Constants::ModernDarkTheme();
+
 	ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplFreeGLUT_NewFrame();
 
@@ -468,7 +470,8 @@ void GameManager::MouseWheel(int wheel, int direction, int x, int y) {
 void GameManager::guiInteraction()
 {
 	ImGuiWindowFlags window_flags = 0;
-	if (ImGui::Begin("My Scene Properties", false, window_flags))
+	EditorGUIRenderer->Render();
+	if (ImGui::Begin("My Scene Properties", false))
 	{
 		//ImGui::RadioButton("external view", &gContext.isDogView, 0); ImGui::SameLine();
 		//ImGui::RadioButton("doggy view", &gContext.isDogView, 1);
@@ -503,8 +506,8 @@ void GameManager::guiInteraction()
 		ImGui::SliderFloat("FOV", &Constants::FOV, 0.0f, 100.0f);
 		if (ImGui::Button("Import HDRI", fullSizeButton))
 		{
-			string filepath = Constants::openFileDialog();
-			std::cout << filepath << std::endl;
+			//string filepath = Constants::openFileDialog();
+			//std::cout << filepath << std::endl;
 			//SkyboxRenderer->SkySphere->loadTexture(filepath);
 		}
 		if (ImGui::CollapsingHeader("Lights"))
@@ -597,24 +600,24 @@ void GameManager::guiInteraction()
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
 
-		ImGui::PushStyleColor(ImGuiCol_Button, Constants::ButtonColor);
+		//ImGui::PushStyleColor(ImGuiCol_Button, Constants::ButtonColor);
 
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Constants::ButtonHoverColor);
+		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Constants::ButtonHoverColor);
 
 		if (ImGui::Button("Save Scene", buttonSize))
 		{
-			std::string filePath = Constants::saveFileDialog();
+			/*std::string filePath = Constants::saveFileDialog();
 			if (!filePath.empty()) {
 				saveModels(Models, gContext.pointlight, filePath);
-			}
+			}*/
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load Scene", buttonSize))
 		{
-			std::string filePath = Constants::openFileDialog();
+			/*std::string filePath = Constants::openFileDialog();
 			if (!filePath.empty()) {
 				loadScene(filePath, Models, gContext.pointlight);
-			}
+			}*/
 			//Constants::LoadLights(gContext.pointlight);
 		}
 		ImGui::SameLine();
@@ -625,8 +628,8 @@ void GameManager::guiInteraction()
 
 		// Reset the style
 		ImGui::PopStyleVar();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
+		//ImGui::PopStyleColor();
+		//ImGui::PopStyleColor();
 	}
 	ImGui::End();
 	//ImGui::PopStyleColor();
