@@ -410,10 +410,7 @@ void GameManager::MouseWheel(int wheel, int direction, int x, int y) {
 //gui interaction handling via imgui
 void GameManager::guiInteraction()
 {
-	ImGuiWindowFlags window_flags = 0;
 	EditorGUIRenderer->Render();
-	EditorGUIRenderer->PropertiesWindow(gContext);
-	//ImGui::PopStyleColor();
 }
 
 void GameManager::drawHUD(const char* text, float x, float y)

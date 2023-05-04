@@ -10,7 +10,7 @@ public:
 
 	void Render();
 	void MenuBar();
-	void PropertiesWindow(Scene& gContext);
+	void PropertiesWindow();
 
 private:
 	string LoadScene();
@@ -42,5 +42,7 @@ private:
 	int sceneSelectionIndex = 0;
 
 	std::string path = "..\\Assets\\Models\\";
+
+	bool ScenePropVisibility = false;
 };
 

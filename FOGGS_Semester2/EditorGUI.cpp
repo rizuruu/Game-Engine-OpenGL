@@ -13,6 +13,9 @@ EditorGUI::EditorGUI(Scene& scene) : sceneRef(scene)
 void EditorGUI::Render()
 {
 	MenuBar();
+
+	if (ScenePropVisibility)
+		PropertiesWindow();
 }
 
 void EditorGUI::MenuBar()
@@ -33,7 +36,7 @@ void EditorGUI::MenuBar()
 		{
 			if (ImGui::MenuItem("New"))
 			{
-				// Handle "New" option click
+				sceneRef.LoadScene("..\\Assets\\Editor\\Default.scene");
 			}
 
 			if (ImGui::MenuItem("Load Scene"))
@@ -61,7 +64,7 @@ void EditorGUI::MenuBar()
 		{
 			if (ImGui::MenuItem("Properties"))
 			{
-				// Handle "New" option click
+				ScenePropVisibility = true;
 			}
 
 			ImGui::EndMenu();
@@ -77,12 +80,10 @@ void EditorGUI::MenuBar()
 	ImGui::PopStyleVar();
 }
 
-void EditorGUI::PropertiesWindow(Scene& gContext)
+void EditorGUI::PropertiesWindow()
 {
 	if (ImGui::Begin("My Scene Properties", false))
 	{
-		//ImGui::RadioButton("external view", &gContext.isDogView, 0); ImGui::SameLine();
-		//ImGui::RadioButton("doggy view", &gContext.isDogView, 1);
 
 		ImGui::Text("Select Model to import:");
 		ImGui::SameLine();
@@ -101,8 +102,6 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 		ImVec2 fullSizeButton(fullWidth, 20);
 		if (ImGui::Button("IMPORT", fullSizeButton))
 		{
-			//cout << Constants::NameWithoutExt(files[importSelectionIndex]) << endl;
-
 			SpawnModel(NameWithoutExt(files[importSelectionIndex]));
 		}
 
@@ -120,27 +119,27 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 		}
 		if (ImGui::CollapsingHeader("Lights"))
 		{
-			ImGui::SliderFloat("ambient light adjust", &gContext.globalAmbient, 0.0f, 1.0f);
+			ImGui::SliderFloat("ambient light adjust", &sceneRef.globalAmbient, 0.0f, 1.0f);
 			ImGui::Checkbox("enable pointlight", &pointlight);
 
-			ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&gContext.pointlight.color));
-			ImGui::SliderFloat("pointlight source x", &gContext.pointlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("pointlight source y", &gContext.pointlight.position[1], 0.0f, 100.0f);
-			ImGui::SliderFloat("pointlight source z", &gContext.pointlight.position[2], -10.0f, 10.0f);
+			ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&sceneRef.pointlight.color));
+			ImGui::SliderFloat("pointlight source x", &sceneRef.pointlight.position[0], -10.0f, 10.0f);
+			ImGui::SliderFloat("pointlight source y", &sceneRef.pointlight.position[1], 0.0f, 100.0f);
+			ImGui::SliderFloat("pointlight source z", &sceneRef.pointlight.position[2], -10.0f, 10.0f);
 
 			ImGui::Checkbox("enable spotlight", &spotlight);
-			ImGui::ColorEdit3("spotlight color", reinterpret_cast<float*>(&gContext.spotlight.color));
-			ImGui::SliderFloat("spotlight source x", &gContext.spotlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source y", &gContext.spotlight.position[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source z", &gContext.spotlight.position[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target x", &gContext.spotlight.target[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target y", &gContext.spotlight.target[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target z", &gContext.spotlight.target[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight cutoff", &gContext.spotlight.cutoff, 0.0f, 90.0f);
-			ImGui::SliderFloat("spotlight exponent", &gContext.spotlight.exponent, 0.0f, 90.0f);
+			ImGui::ColorEdit3("spotlight color", reinterpret_cast<float*>(&sceneRef.spotlight.color));
+			ImGui::SliderFloat("spotlight source x", &sceneRef.spotlight.position[0], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight source y", &sceneRef.spotlight.position[1], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight source z", &sceneRef.spotlight.position[2], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight target x", &sceneRef.spotlight.target[0], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight target y", &sceneRef.spotlight.target[1], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight target z", &sceneRef.spotlight.target[2], -10.0f, 10.0f);
+			ImGui::SliderFloat("spotlight cutoff", &sceneRef.spotlight.cutoff, 0.0f, 90.0f);
+			ImGui::SliderFloat("spotlight exponent", &sceneRef.spotlight.exponent, 0.0f, 90.0f);
 
-			pointlight ? gContext.pointlight.enable() : gContext.pointlight.disable();
-			spotlight ? gContext.spotlight.enable() : gContext.spotlight.disable();
+			pointlight ? sceneRef.pointlight.enable() : sceneRef.pointlight.disable();
+			spotlight ? sceneRef.spotlight.enable() : sceneRef.spotlight.disable();
 		}
 
 		if (ImGui::CollapsingHeader("Scene Hierarchy")) {
@@ -151,37 +150,37 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 					std::vector<ModelLoader*>* models = (std::vector<ModelLoader*>*)data;
 					*out_text = (*models)[index]->Name.c_str();
 					return true;
-				}, &gContext.GameObjects, gContext.GameObjects.size());
+				}, &sceneRef.GameObjects, sceneRef.GameObjects.size());
 
 			ImGui::Indent();
 
-			if (gContext.GameObjects.size() != 0 && sceneSelectionIndex != -1) {
+			if (sceneRef.GameObjects.size() != 0 && sceneSelectionIndex != -1) {
 				ImGui::Text("Transform");
 				if (ImGui::CollapsingHeader("Position"))
 				{
-					ImGui::SliderFloat3("Position", &gContext.GameObjects[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
+					ImGui::SliderFloat3("Position", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
 				}
 				if (ImGui::CollapsingHeader("Rotation"))
 				{
-					ImGui::SliderFloat3("Rotation", &gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
+					ImGui::SliderFloat3("Rotation", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
 				}
 				if (ImGui::CollapsingHeader("Scale"))
 				{
-					float scale = gContext.GameObjects[sceneSelectionIndex]->Transform.Scale.x;
+					float scale = sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x;
 					if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f, "%.2f", 2.0f))
 					{
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Scale.x = scale;
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Scale.y = scale;
-						gContext.GameObjects[sceneSelectionIndex]->Transform.Scale.z = scale;
+						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x = scale;
+						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.y = scale;
+						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.z = scale;
 					}
-					ImGui::SliderFloat3("Scale", &gContext.GameObjects[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
+					ImGui::SliderFloat3("Scale", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
 				}
 
 				if (ImGui::Button("Reset"))
 				{
-					gContext.GameObjects[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
-					gContext.GameObjects[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
-					gContext.GameObjects[sceneSelectionIndex]->Transform.Scale = Vector3::One();
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale = Vector3::One();
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Delete"))
@@ -192,6 +191,7 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 			else {
 				// An element is selected
 			}
+			ImGui::Unindent();
 		}
 
 		verticalSpacing = ImVec2(0.0f, 10.0f);
@@ -204,7 +204,7 @@ void EditorGUI::PropertiesWindow(Scene& gContext)
 		ImGui::SameLine();
 		if (ImGui::Button("Close", buttonSize))
 		{
-			exit(0);
+			ScenePropVisibility = false;
 		}
 
 		// Reset the style

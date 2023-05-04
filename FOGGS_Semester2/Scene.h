@@ -39,6 +39,9 @@ public:
 	void SaveScene()
 	{
 		string filePath = saveFileDialog();
+		if (filePath.empty())
+			return;
+
 		std::ofstream file(filePath, std::ios::binary | std::ios::trunc);
 
 		if (!file) {
@@ -79,10 +82,64 @@ public:
 	void LoadScene()
 	{
 		string filePath = openFileDialog();
+		if (filePath.empty())
+			return;
+
 		std::ifstream file(filePath, std::ios::binary);
 
 		if (!file) {
 			throw std::runtime_error("Error opening file for reading");
+		}
+
+		// Load models
+		// Read the number of models from the file
+		size_t numModels = 0;
+		file.read(reinterpret_cast<char*>(&numModels), sizeof(numModels));
+
+		GameObjects.clear();
+
+		// Read the name and transform of each model from the file
+		for (size_t i = 0; i < numModels; ++i) {
+			// Read the name of the model
+			std::string modelName;
+			std::getline(file, modelName, '\0');
+
+			// Read the transform of the model
+			Transform transform;
+			file.read(reinterpret_cast<char*>(&transform), sizeof(Transform));
+
+			// Create a ModelLoader object with the loaded data and add it to the models vector
+			ModelLoader* model = new ModelLoader(extractFileName(modelName));
+			model->Transform = transform;
+			GameObjects.push_back(model);
+		}
+
+		// Load light properties
+		// Read the color of the light
+		file.read(reinterpret_cast<char*>(pointlight.color), sizeof(pointlight.color));
+
+		// Read the position of the light
+		file.read(reinterpret_cast<char*>(&pointlight.position), sizeof(pointlight.position));
+		file.read(reinterpret_cast<char*>(&globalAmbient), sizeof(globalAmbient));
+
+		file.close();
+	}
+
+	void LoadScene(string filePath)
+	{
+		if (filePath.empty())
+			return;
+		std::ifstream file(filePath, std::ios::binary);
+
+		try {
+			if (!file) {
+				throw std::runtime_error("Error opening file for reading");
+			}
+
+			// ... (rest of the code that reads from the file)
+		}
+		catch (const std::runtime_error& e) {
+			std::cerr << "Exception caught: " << e.what() << std::endl;
 		}
 
 		// Load models
