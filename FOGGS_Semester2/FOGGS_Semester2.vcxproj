@@ -116,6 +116,8 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GLUTCallbacks.h" />
+    <ClInclude Include="IconsFontAwesome.h" />
+    <ClInclude Include="ImGuiUtils.h" />
     <ClInclude Include="Matrix3.h" />
     <ClInclude Include="Mirror.h" />
     <ClInclude Include="ModelLoader.h" />

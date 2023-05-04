@@ -36,6 +36,7 @@ void GameManager::Init(int argc, char** argv) {
 	glutInitWindowPosition(80, 80);
 	glutInitWindowSize(1200, 600);
 	glutCreateWindow(Constants::GameTitle);
+	glutFullScreen();
 
 	glutTimerFunc(1000 / 60, GLUTCallbacks::Timer, 0);
 	glutDisplayFunc(GLUTCallbacks::Display);
@@ -305,7 +306,7 @@ void GameManager::drawScene() {
 	gContext.pointlight.draw();
 	glPopMatrix();
 
-	gContext.floor.draw();
+	//gContext.floor.draw();
 
 	if (!Constants::EditorMode)
 		RoboPlayer->Render();
@@ -317,9 +318,9 @@ void GameManager::drawScene() {
 		glPopMatrix();
 	}
 
-	if (Constants::EditorMode)
-		drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
-	drawHUD(Constants::Combine("Editor Mode:", Constants::EditorMode), 0, 20);
+	//if (Constants::EditorMode)
+	//	drawHUD(Constants::Combine("Freelook Speed:", freeLookSpeed), 0, 0);
+	//drawHUD(Constants::Combine("Editor Mode:", Constants::EditorMode), 0, 20);
 }
 
 void GameManager::readFiles()
@@ -395,6 +396,8 @@ void GameManager::EditorInput(unsigned char key)
 		break;
 	case 'p':
 		freeLook = !freeLook;
+		break;
+	case 'l':
 		break;
 	default:
 		break;

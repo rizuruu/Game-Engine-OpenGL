@@ -169,6 +169,79 @@ public:
             return "";
         }
     }
+
+    void savePixelsToBMP(const char* filename, GLubyte* pixels, int width, int height) {
+        std::ofstream outFile(filename, std::ios::out | std::ios::binary);
+
+        if (!outFile.is_open()) {
+            std::cerr << "Error: Could not open file for writing: " << filename << std::endl;
+            return;
+        }
+
+        int fileSize = 54 + 3 * width * height;
+        int pixelDataSize = 3 * width * height;
+
+        // BMP file header (14 bytes)
+        unsigned char fileHeader[14] = {
+            'B', 'M',                 // ID field
+            0, 0, 0, 0,               // File size
+            0, 0,                     // Reserved
+            0, 0,                     // Reserved
+            54, 0, 0, 0               // Pixel data offset
+        };
+
+        // Write the file size to the header
+        fileHeader[2] = (unsigned char)(fileSize);
+        fileHeader[3] = (unsigned char)(fileSize >> 8);
+        fileHeader[4] = (unsigned char)(fileSize >> 16);
+        fileHeader[5] = (unsigned char)(fileSize >> 24);
+
+        // BMP info header (40 bytes)
+        unsigned char infoHeader[40] = {
+            40, 0, 0, 0,              // Header size
+            0, 0, 0, 0,               // Image width
+            0, 0, 0, 0,               // Image height
+            1, 0,                     // Number of color planes
+            24, 0,                    // Bits per pixel
+            0, 0, 0, 0,               // Compression method
+            0, 0, 0, 0,               // Pixel data size
+            0, 0, 0, 0,               // Horizontal resolution
+            0, 0, 0, 0,               // Vertical resolution
+            0, 0, 0, 0,               // Number of colors in the palette
+            0, 0, 0, 0                // Number of important colors
+        };
+
+        // Write the width and height to the info header
+        infoHeader[4] = (unsigned char)(width);
+        infoHeader[5] = (unsigned char)(width >> 8);
+        infoHeader[6] = (unsigned char)(width >> 16);
+        infoHeader[7] = (unsigned char)(width >> 24);
+        infoHeader[8] = (unsigned char)(height);
+        infoHeader[9] = (unsigned char)(height >> 8);
+        infoHeader[10] = (unsigned char)(height >> 16);
+        infoHeader[11] = (unsigned char)(height >> 24);
+
+        // Write headers to the file
+        outFile.write(reinterpret_cast<char*>(fileHeader), sizeof(fileHeader));
+        outFile.write(reinterpret_cast<char*>(infoHeader), sizeof(infoHeader));
+
+        // Write the pixel data to the file (bottom-up)
+        for (int i = height - 1; i >= 0; i--) {
+            for (int j = 0; j < width; j++) {
+                int index = (i * width + j) * 4;
+                outFile.put(pixels[index + 2]); // Blue
+                outFile.put(pixels[index + 1]); // Green
+                outFile.put(pixels[index]);     // Red
+            }
+
+            // Add padding to align rows to 4-byte boundaries
+            for (int j = 0; j < (4 - (width * 3) % 4) % 4; j++) {
+                outFile.put(0);
+            }
+        }
+
+        outFile.close();
+    }
 };
 
 const std::string& Constants::SaveFileName = "EngineSaveData";
