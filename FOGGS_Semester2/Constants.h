@@ -99,7 +99,7 @@ public:
         style.WindowTitleAlign = { 0.0, 0.5 };
 
         ImVec4* colors = ImGui::GetStyle().Colors;
-        colors[ImGuiCol_Text] = { 1.0f, 1.0f, 1.0f, 1.00f };				//
+        colors[ImGuiCol_Text] = { 0.7f, 0.7f, 0.7f, 1.0f };				//
         colors[ImGuiCol_TextDisabled] = { 0.25f, 0.25f, 0.25f, 1.00f };		//
         colors[ImGuiCol_WindowBg] = { 0.09f, 0.09f, 0.09f, 0.94f };			//
         colors[ImGuiCol_ChildBg] = { 0.11f, 0.11f, 0.11f, 1.00f };			//

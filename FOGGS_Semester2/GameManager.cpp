@@ -46,7 +46,9 @@ void GameManager::Init(int argc, char** argv) {
 	ImGui_ImplFreeGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
 
-	// Load the model and texture
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("..\\Assets\\Fonts\\Comme-Medium.ttf", 21.0f);	// Load the model and texture
+
 	//try {
 	//	model = new ModelLoader("model");
 	//	Models.push_back(model);

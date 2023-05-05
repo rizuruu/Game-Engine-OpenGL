@@ -170,6 +170,9 @@
     <ClInclude Include="IconsFontAwesome.h" />
     <ClInclude Include="ImGuiUtils.h" />
     <ClInclude Include="EditorGUI.h" />
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

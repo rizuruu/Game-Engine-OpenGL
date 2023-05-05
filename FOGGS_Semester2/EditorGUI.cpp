@@ -16,8 +16,13 @@ EditorGUI::EditorGUI(Scene& scene) : sceneRef(scene)
 void EditorGUI::Render()
 {
 	MenuBar();
+
 	if (ScenePropVisibility)
 		PropertiesWindow();
+	if (ImportWindowVisibility)
+		ImportWindow();
+
+	InspectorWindow();
 
 	if (showLoading)
 	{
@@ -69,11 +74,16 @@ void EditorGUI::MenuBar()
 			// Handle "Edit" menu item click
 		}
 
-		if (ImGui::BeginMenu("Scene"))
+		if (ImGui::BeginMenu("Windows"))
 		{
-			if (ImGui::MenuItem("Properties"))
+			if (ImGui::MenuItem("Hierarchy"))
 			{
 				ScenePropVisibility = true;
+			}
+
+			if (ImGui::MenuItem("Import Game Object"))
+			{
+				ImportWindowVisibility = true;
 			}
 
 			ImGui::EndMenu();
@@ -93,38 +103,11 @@ void EditorGUI::PropertiesWindow()
 {
 	if (ImGui::Begin("My Scene Properties", false))
 	{
-		ImGui::Text("Select Model to import:");
-		ImGui::SameLine();
-		if (ImGui::Button("Refresh"))
-		{
-			ReadFiles();
-		}
-
-		ImGui::ListBox("", &importSelectionIndex,
-			[](void* data, int index, const char** out_text) {
-				*out_text = (*(std::vector<std::string>*)data)[index].c_str();
-				return true;
-			}, (void*)&files, files.size());
-
-		float fullWidth = ImGui::GetContentRegionAvailWidth();
-		ImVec2 fullSizeButton(fullWidth, 20);
-		if (ImGui::Button("IMPORT", fullSizeButton))
-		{
-			SpawnModel(NameWithoutExt(files[importSelectionIndex]));
-		}
-
 		ImVec2 verticalSpacing(0.0f, 10.0f);
 		ImGui::Dummy(verticalSpacing);
 
 		static bool pointlight = true;
 		static bool spotlight = true;
-		//ImGui::SliderFloat("FOV", &Constants::FOV, 0.0f, 100.0f);
-		if (ImGui::Button("Import HDRI", fullSizeButton))
-		{
-			//string filepath = Constants::openFileDialog();
-			//std::cout << filepath << std::endl;
-			//SkyboxRenderer->SkySphere->loadTexture(filepath);
-		}
 		if (ImGui::CollapsingHeader("Lights"))
 		{
 			ImGui::SliderFloat("ambient light adjust", &sceneRef.globalAmbient, 0.0f, 1.0f);
@@ -153,53 +136,12 @@ void EditorGUI::PropertiesWindow()
 		if (ImGui::CollapsingHeader("Scene Hierarchy")) {
 			ImGui::Text("Scene");
 			// Display the list of model names using ImGui::ListBox()
-			ImGui::ListBox(".", &sceneSelectionIndex,
+			ImGui::ListBox("##GameObjects", &sceneSelectionIndex,
 				[](void* data, int index, const char** out_text) {
 					std::vector<ModelLoader*>* models = (std::vector<ModelLoader*>*)data;
 					*out_text = (*models)[index]->Name.c_str();
 					return true;
 				}, &sceneRef.GameObjects, sceneRef.GameObjects.size());
-
-			ImGui::Indent();
-
-			if (sceneRef.GameObjects.size() != 0 && sceneSelectionIndex != -1) {
-				ImGui::Text("Transform");
-				if (ImGui::CollapsingHeader("Position"))
-				{
-					ImGui::SliderFloat3("Position", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
-				}
-				if (ImGui::CollapsingHeader("Rotation"))
-				{
-					ImGui::SliderFloat3("Rotation", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
-				}
-				if (ImGui::CollapsingHeader("Scale"))
-				{
-					float scale = sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x;
-					if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f, "%.2f", 2.0f))
-					{
-						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x = scale;
-						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.y = scale;
-						sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.z = scale;
-					}
-					ImGui::SliderFloat3("Scale", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
-				}
-
-				if (ImGui::Button("Reset"))
-				{
-					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
-					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
-					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale = Vector3::One();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Delete"))
-				{
-					DeleteModel(sceneSelectionIndex);
-				}
-			}
-			else {
-				// An element is selected
-			}
-			ImGui::Unindent();
 		}
 
 		verticalSpacing = ImVec2(0.0f, 10.0f);
@@ -219,6 +161,81 @@ void EditorGUI::PropertiesWindow()
 		ImGui::PopStyleVar();
 		//ImGui::PopStyleColor();
 		//ImGui::PopStyleColor();
+	}
+	ImGui::End();
+}
+
+void EditorGUI::ImportWindow()
+{
+	if (ImGui::Begin("Import Game Objects"))
+	{
+		float fullWidth = ImGui::GetContentRegionAvailWidth();
+
+		ImGui::Text("Select Model to import:");
+		ImGui::SameLine();
+		if (ImGui::Button("Refresh"))
+		{
+			ReadFiles();
+		}
+
+		ImGui::ListBox("##list", &importSelectionIndex,
+			[](void* data, int index, const char** out_text) {
+				*out_text = (*(std::vector<std::string>*)data)[index].c_str();
+				return true;
+			}, (void*)&files, files.size(), 20);
+
+
+		ImVec2 fullSizeButton(fullWidth, 30);
+		if (ImGui::Button("IMPORT", fullSizeButton))
+		{
+			SpawnModel(NameWithoutExt(files[importSelectionIndex]));
+		}
+		if (ImGui::Button("Close", fullSizeButton))
+		{
+			ImportWindowVisibility = false;
+		}
+	}
+	ImGui::End();
+}
+
+void EditorGUI::InspectorWindow()
+{
+	if (ImGui::Begin("Inspector"))
+	{
+		if (sceneRef.GameObjects.size() != 0 && sceneSelectionIndex >= 0) {
+			ImGui::Text("Transform");
+			if (ImGui::CollapsingHeader("Position"))
+			{
+				ImGui::SliderFloat3("Position", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position.x, -10.0f, 10.0f);
+			}
+			if (ImGui::CollapsingHeader("Rotation"))
+			{
+				ImGui::SliderFloat3("Rotation", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation.x, 0.0f, 360.0f);
+			}
+			if (ImGui::CollapsingHeader("Scale"))
+			{
+				float scale = sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x;
+				if (ImGui::SliderFloat("All Scale", &scale, 0.0f, 100.0f, "%.2f", 2.0f))
+				{
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x = scale;
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.y = scale;
+					sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.z = scale;
+				}
+				ImGui::SliderFloat3("Scale", &sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale.x, 0.0f, 100.0f);
+			}
+
+			if (ImGui::Button("Reset"))
+			{
+				sceneRef.GameObjects[sceneSelectionIndex]->Transform.Position = Vector3::Zero();
+				sceneRef.GameObjects[sceneSelectionIndex]->Transform.Rotation = Vector3::Zero();
+				sceneRef.GameObjects[sceneSelectionIndex]->Transform.Scale = Vector3::One();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Delete"))
+			{
+				DeleteModel(sceneSelectionIndex);
+			}
+		}
 	}
 	ImGui::End();
 }

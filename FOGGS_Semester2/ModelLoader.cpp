@@ -5,6 +5,8 @@
 #include <cerrno>
 #include <cstring>
 #include <filesystem>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 ModelLoader::ModelLoader(const std::string& modelName)
     : textureID(0), Name(modelName) {  // Initialize textureID to 0
@@ -54,6 +56,10 @@ void ModelLoader::render() {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
+    // Enable alpha blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     std::string lastMaterial = ""; // Add a variable to keep track of the last material
     for (const Face& face : faces) {
         if (face.materialName != lastMaterial) { // Check if the material has changed
@@ -75,6 +81,8 @@ void ModelLoader::render() {
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
+    // Disable alpha blending
+    glDisable(GL_BLEND);
 }
 
 bool ModelLoader::loadObj(const std::string& filename) {
@@ -149,41 +157,27 @@ bool ModelLoader::loadObj(const std::string& filename) {
 }
 
 bool ModelLoader::loadTexture(const std::string& filename) {
-    std::ifstream textureFile(filename, std::ios::binary);
+    int width, height, channels;
 
-    if (!textureFile.is_open()) {
-        std::cerr << "Error: Could not open texture file." << std::endl;
+    stbi_set_flip_vertically_on_load(true);
+
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
+    if (!data) {
+        std::cerr << "Error loading image: " << stbi_failure_reason() << std::endl;
         return false;
     }
 
-    BITMAPFILEHEADER fileHeader;
-    textureFile.read(reinterpret_cast<char*>(&fileHeader), sizeof(fileHeader));
+    // If the image has an alpha channel, use GL_RGBA, otherwise use GL_RGB
+    GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
 
-    BITMAPINFOHEADER infoHeader;
-    textureFile.read(reinterpret_cast<char*>(&infoHeader), sizeof(infoHeader));
+    textureID = createTexture(data, width, height, format);
 
-    // Print some debugging information about the texture
-    std::cout << "Texture width: " << infoHeader.biWidth << std::endl;
-    std::cout << "Texture height: " << infoHeader.biHeight << std::endl;
-    std::cout << "Texture bit count: " << infoHeader.biBitCount << std::endl;
-
-    int width = infoHeader.biWidth;
-    int height = infoHeader.biHeight;
-    int imageSize = width * height * (infoHeader.biBitCount / 8);
-    unsigned char* data = new unsigned char[imageSize];
-
-    textureFile.seekg(fileHeader.bfOffBits);
-    textureFile.read(reinterpret_cast<char*>(data), imageSize);
-    textureFile.close();
-
-    textureID = createTexture(data, width, height);
-
-    delete[] data;
+    stbi_image_free(data);
 
     return textureID != 0;
 }
 
-GLuint ModelLoader::createTexture(const unsigned char* data, int width, int height) {
+GLuint ModelLoader::createTexture(const unsigned char* data, int width, int height, GLenum format) {
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -195,7 +189,7 @@ GLuint ModelLoader::createTexture(const unsigned char* data, int width, int heig
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812f);
 
     // Upload texture data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, 0x80E0, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     // Unbind the texture
     glBindTexture(GL_TEXTURE_2D, 0);

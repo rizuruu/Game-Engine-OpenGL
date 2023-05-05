@@ -46,7 +46,7 @@ private:
 
     bool loadObj(const std::string& filename);
     bool loadTexture(const std::string& filename);
-    GLuint createTexture(const unsigned char* data, int width, int height);
+    GLuint createTexture(const unsigned char* data, int width, int height, GLenum format);
 
     bool loadMtl(const std::string& filename);
 
@@ -57,7 +57,7 @@ private:
     }
     const std::string GetTexturePath(std::string Name)
     {
-        return "..\\Assets\\Textures\\" + extractFileName(Name) + ".bmp";
+        return "..\\Assets\\Textures\\" + extractFileName(Name) + ".png";
     }
     const std::string GetMaterialPath(std::string Name)
     {

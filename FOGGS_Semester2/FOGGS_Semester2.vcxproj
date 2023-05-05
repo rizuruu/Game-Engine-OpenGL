@@ -129,6 +129,7 @@
     <ClInclude Include="Floor.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Spotlight.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="Table.h" />

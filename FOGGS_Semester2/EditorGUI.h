@@ -8,17 +8,18 @@ using namespace std;
 class EditorGUI
 {
 public:
-	EditorGUI();
 	EditorGUI(Scene& scene);
 
 	void Render();
-	void MenuBar();
-	void PropertiesWindow();
-
 	void ProgressBar(const char* title);
 	void SetLoading(bool loading) { showLoading = loading; }
 	void SetLoadingTitle(const char* title) { LoadingTitle = title; }
 private:
+	void MenuBar();
+	void PropertiesWindow();
+	void ImportWindow();
+	void InspectorWindow();
+
 	string LoadScene();
 	string SaveScene();
 	string wstringToString(const std::wstring& wstr);
@@ -50,6 +51,7 @@ private:
 	std::string path = "..\\Assets\\Models\\";
 
 	bool ScenePropVisibility = false;
+	bool ImportWindowVisibility = false;
 	bool showLoading = false;
 	const char* LoadingTitle = "";
 };
