@@ -1,17 +1,23 @@
 #pragma once
 #include <string>
 #include "Scene.h"
+#include <mutex>
+
 using namespace std;
 
 class EditorGUI
 {
 public:
+	EditorGUI();
 	EditorGUI(Scene& scene);
 
 	void Render();
 	void MenuBar();
 	void PropertiesWindow();
 
+	void ProgressBar(const char* title);
+	void SetLoading(bool loading) { showLoading = loading; }
+	void SetLoadingTitle(const char* title) { LoadingTitle = title; }
 private:
 	string LoadScene();
 	string SaveScene();
@@ -44,5 +50,8 @@ private:
 	std::string path = "..\\Assets\\Models\\";
 
 	bool ScenePropVisibility = false;
+	bool showLoading = false;
+	const char* LoadingTitle = "";
 };
 
+void LoadSceneThread(Scene& sceneRef, EditorGUI& editorGUI);

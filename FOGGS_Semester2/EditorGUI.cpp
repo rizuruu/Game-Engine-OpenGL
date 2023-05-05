@@ -2,20 +2,27 @@
 #include "imgui/imgui.h"
 #include <windows.h>
 #include <commdlg.h>
+#include <thread>
+#include <Objbase.h>
 
 using namespace std;
 
 EditorGUI::EditorGUI(Scene& scene) : sceneRef(scene)
 {
 	ReadFiles();
+
 }
 
 void EditorGUI::Render()
 {
 	MenuBar();
-
 	if (ScenePropVisibility)
 		PropertiesWindow();
+
+	if (showLoading)
+	{
+		ProgressBar(LoadingTitle);
+	}
 }
 
 void EditorGUI::MenuBar()
@@ -41,7 +48,9 @@ void EditorGUI::MenuBar()
 
 			if (ImGui::MenuItem("Load Scene"))
 			{
-				sceneRef.LoadScene();
+				showLoading = true;
+				std::thread loadingThread(LoadSceneThread, std::ref(sceneRef), std::ref(*this));
+				loadingThread.detach();
 			}
 
 			if (ImGui::MenuItem("Save Scene"))
@@ -84,7 +93,6 @@ void EditorGUI::PropertiesWindow()
 {
 	if (ImGui::Begin("My Scene Properties", false))
 	{
-
 		ImGui::Text("Select Model to import:");
 		ImGui::SameLine();
 		if (ImGui::Button("Refresh"))
@@ -215,6 +223,32 @@ void EditorGUI::PropertiesWindow()
 	ImGui::End();
 }
 
+void EditorGUI::ProgressBar(const char* title)
+{
+	// Inside your render loop or function where ImGui is being used
+	{
+		// Update progress value (replace this with your actual loading status)
+		static float progress = 0.0f;
+		progress += 0.0004f;
+		if (progress > 1.0f) {
+			progress = 0.0f;
+		}
+		// Set the window size and position to be in the center of the screen
+		ImVec2 windowSize(300, 100);
+		ImVec2 windowPos = ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f - windowSize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f - windowSize.y * 0.5f);
+		ImGui::SetNextWindowSize(windowSize);
+		ImGui::SetNextWindowPos(windowPos);
+
+		ImGui::Begin(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+		// Display the loading bar
+		ImGui::Text("Loading...");
+		ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f)); // -1.0f width makes the progress bar fit the window width
+
+		ImGui::End();
+	}
+}
+
 string EditorGUI::LoadScene()
 {
 	OPENFILENAME ofn;
@@ -318,4 +352,24 @@ void EditorGUI::ReadFiles()
 		closedir(dir);
 	}
 #endif
+}
+
+
+void LoadSceneThread(Scene& sceneRef, EditorGUI& editorGUI)
+{
+	// Initialize COM on this thread
+	HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		std::cerr << "Failed to initialize COM on the new thread. Error: " << hr << std::endl;
+		return;
+	}
+
+	std::cout << "loading" << std::endl;
+	editorGUI.SetLoadingTitle("Loading Scene");
+	sceneRef.LoadScene();
+	editorGUI.SetLoading(false);
+
+	// Uninitialize COM on this thread
+	CoUninitialize();
 }
