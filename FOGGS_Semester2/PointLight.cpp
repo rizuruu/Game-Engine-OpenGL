@@ -1,7 +1,7 @@
 #include "PointLight.h"
 
-PointLight::PointLight() : color{ 0.691f, 0.653f, 0.254f , 1.0f },
-position{ 4.3f, 3.0f, 0.0f , 1.0f } {}
+PointLight::PointLight() : color{ 0.8f, 0.8f, 0.8f , 1.0f },
+position{ 4.3f, 6.0f, 0.0f , 1.0f } {}
 
 void PointLight::addLight() {
 	if (!glIsEnabled(GL_LIGHT0))

@@ -62,6 +62,7 @@ void GameManager::Init(int argc, char** argv) {
 	else
 	{
 		glutSetCursor(GLUT_CURSOR_NONE);
+		//gContext.LoadScene("..\\Assets\\Editor\\Default.scene");
 	}
 	
 

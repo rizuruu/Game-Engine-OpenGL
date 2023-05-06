@@ -44,6 +44,7 @@ private:
     std::vector<Face> faces;
     std::vector<Normal> normals;
     std::map<std::string, GLuint> materialTextures;
+    std::map<std::string, bool> materialEmissions;
     GLuint textureID;
 
     bool loadObj(const std::string& filename);

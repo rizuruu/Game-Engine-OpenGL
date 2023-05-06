@@ -120,21 +120,27 @@ void EditorGUI::PropertiesWindow()
 			ImGui::SliderFloat("ambient light adjust", &sceneRef.globalAmbient, 0.0f, 1.0f);
 			ImGui::Checkbox("enable pointlight", &pointlight);
 
-			ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&sceneRef.pointlight.color));
-			ImGui::SliderFloat("pointlight source x", &sceneRef.pointlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("pointlight source y", &sceneRef.pointlight.position[1], 0.0f, 100.0f);
-			ImGui::SliderFloat("pointlight source z", &sceneRef.pointlight.position[2], -10.0f, 10.0f);
+			if (pointlight)
+			{
+				ImGui::ColorEdit3("point light color", reinterpret_cast<float*>(&sceneRef.pointlight.color));
+				ImGui::SliderFloat("pointlight source x", &sceneRef.pointlight.position[0], -10.0f, 10.0f);
+				ImGui::SliderFloat("pointlight source y", &sceneRef.pointlight.position[1], 0.0f, 100.0f);
+				ImGui::SliderFloat("pointlight source z", &sceneRef.pointlight.position[2], -10.0f, 10.0f);
+			}
 
 			ImGui::Checkbox("enable spotlight", &spotlight);
-			ImGui::ColorEdit3("spotlight color", reinterpret_cast<float*>(&sceneRef.spotlight.color));
-			ImGui::SliderFloat("spotlight source x", &sceneRef.spotlight.position[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source y", &sceneRef.spotlight.position[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight source z", &sceneRef.spotlight.position[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target x", &sceneRef.spotlight.target[0], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target y", &sceneRef.spotlight.target[1], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight target z", &sceneRef.spotlight.target[2], -10.0f, 10.0f);
-			ImGui::SliderFloat("spotlight cutoff", &sceneRef.spotlight.cutoff, 0.0f, 90.0f);
-			ImGui::SliderFloat("spotlight exponent", &sceneRef.spotlight.exponent, 0.0f, 90.0f);
+			if (spotlight)
+			{
+				ImGui::ColorEdit3("spotlight color", reinterpret_cast<float*>(&sceneRef.spotlight.color));
+				ImGui::SliderFloat("spotlight source x", &sceneRef.spotlight.position[0], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight source y", &sceneRef.spotlight.position[1], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight source z", &sceneRef.spotlight.position[2], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight target x", &sceneRef.spotlight.target[0], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight target y", &sceneRef.spotlight.target[1], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight target z", &sceneRef.spotlight.target[2], -10.0f, 10.0f);
+				ImGui::SliderFloat("spotlight cutoff", &sceneRef.spotlight.cutoff, 0.0f, 90.0f);
+				ImGui::SliderFloat("spotlight exponent", &sceneRef.spotlight.exponent, 0.0f, 90.0f);
+			}
 
 			pointlight ? sceneRef.pointlight.enable() : sceneRef.pointlight.disable();
 			spotlight ? sceneRef.spotlight.enable() : sceneRef.spotlight.disable();

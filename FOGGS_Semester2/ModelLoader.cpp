@@ -65,7 +65,18 @@ void ModelLoader::render() {
         if (face.materialName != lastMaterial) { // Check if the material has changed
             lastMaterial = face.materialName;
             glBindTexture(GL_TEXTURE_2D, materialTextures[lastMaterial]);
+
+            // Apply red emission if the material has "_Emission" at the end of its name
+            if (materialEmissions[lastMaterial]) {
+                GLfloat emission[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+                glMaterialfv(GL_FRONT, GL_EMISSION, emission);
+            }
+            else {
+                GLfloat noEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+                glMaterialfv(GL_FRONT, GL_EMISSION, noEmission);
+            }
         }
+
         glBegin(GL_TRIANGLES);
         for (int i = 0; i < 3; ++i) {
             const TexCoord& texCoord = texCoords[face.texCoordIndex[i]];
@@ -213,6 +224,12 @@ bool ModelLoader::loadMtl(const std::string& filename) {
 
         if (type == "newmtl") {
             lineStream >> currentMaterial;
+            if (currentMaterial.length() >= 9 && currentMaterial.substr(currentMaterial.length() - 9) == "_Emission") {
+                materialEmissions[currentMaterial] = true;
+            }
+            else {
+                materialEmissions[currentMaterial] = false;
+            }
         }
         else if (type == "map_Kd") {
             std::string textureName;
