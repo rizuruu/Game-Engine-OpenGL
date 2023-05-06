@@ -20,13 +20,14 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
-
+#include "Skybox.h"
 using namespace std;
 /*
 The context holds all rendered objects, a single point to access the scene objects.
 */
 class Scene {
 public:
+	Skybox* SkyboxRenderer;
 	GLfloat globalAmbient = 0.3f;
 	int isDogView = 1;
 	Camera camera;
@@ -76,6 +77,11 @@ public:
 		// Write global light
 		file.write(reinterpret_cast<const char*>(&globalAmbient), sizeof(globalAmbient));
 
+		// Write current sky
+		std::size_t length = SkyboxRenderer->CurrentSky.size();
+		file.write(reinterpret_cast<const char*>(&length), sizeof(length));
+		file.write(SkyboxRenderer->CurrentSky.c_str(), length);
+
 		file.close();
 	}
 
@@ -122,6 +128,13 @@ public:
 		file.read(reinterpret_cast<char*>(&pointlight.position), sizeof(pointlight.position));
 		file.read(reinterpret_cast<char*>(&globalAmbient), sizeof(globalAmbient));
 
+		// Read current sky
+		std::size_t length;
+		file.read(reinterpret_cast<char*>(&length), sizeof(length));
+		SkyboxRenderer->CurrentSky.resize(length);
+		file.read(reinterpret_cast<char*>(&SkyboxRenderer->CurrentSky[0]), length);
+
+		SkyboxRenderer->UpdateSky(SkyboxRenderer->CurrentSky);
 		file.close();
 	}
 
@@ -172,6 +185,14 @@ public:
 		// Read the position of the light
 		file.read(reinterpret_cast<char*>(&pointlight.position), sizeof(pointlight.position));
 		file.read(reinterpret_cast<char*>(&globalAmbient), sizeof(globalAmbient));
+
+		// Read current sky
+		std::size_t length;
+		file.read(reinterpret_cast<char*>(&length), sizeof(length));
+		SkyboxRenderer->CurrentSky.resize(length);
+		file.read(reinterpret_cast<char*>(&SkyboxRenderer->CurrentSky[0]), length);
+
+		SkyboxRenderer->UpdateSky(SkyboxRenderer->CurrentSky);
 
 		file.close();
 	}

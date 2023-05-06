@@ -19,6 +19,7 @@ private:
 	void PropertiesWindow();
 	void ImportWindow();
 	void InspectorWindow();
+	void SkyWindow();
 
 	string LoadScene();
 	string SaveScene();
@@ -27,7 +28,9 @@ private:
 	void SpawnModel(string name);
 	void DeleteModel(int i);
 
-	void ReadFiles();
+	void ReadFiles(string type);
+
+	void ReadSkies(string type);
 
 	static const std::string NameWithoutExt(std::string n)
 	{
@@ -45,10 +48,13 @@ private:
 	Scene& sceneRef;
 
 	std::vector<std::string> files;
+	std::vector<std::string> skyboxFiles;
 	int importSelectionIndex = 0;
 	int sceneSelectionIndex = 0;
+	int skySelectionIndex = 0;
 
 	std::string path = "..\\Assets\\Models\\";
+	std::string skyPath = "..\\Assets\\Skybox\\";
 
 	bool ScenePropVisibility = false;
 	bool ImportWindowVisibility = false;

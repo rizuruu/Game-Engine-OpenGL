@@ -21,7 +21,9 @@ Skybox::Skybox(SkyType type, const char* filenames[6]) : skyType(type) {
 Skybox::Skybox(SkyType type) : skyType(type)
 {
     SkySphere = new ModelLoader("SkySphere");
-    SkySphere->Transform.Scale = Vector3(2250, 2250, 2250);
+    
+    UpdateSky("..\\Assets\\Skybox\\Fantasy.png" );
+    SkySphere->Transform.Scale = Vector3(5250, 5250, 5250);
 }
 
 Skybox::~Skybox() {
@@ -138,4 +140,10 @@ unsigned char* Skybox::allocateBmp(char* filename, int& width, int& height) {
     }
 
     return data;
+}
+
+void Skybox::UpdateSky(const std::string& texturePath) {
+    std::cout << "updating sky: " << texturePath << std::endl;
+    SkySphere->UpdateTextureForMaterial("Cubemap", texturePath);
+    CurrentSky = texturePath;
 }

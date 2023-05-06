@@ -23,7 +23,6 @@ GameManager::~GameManager()
 	}
 	Models.clear();*/
 
-	delete SkyboxRenderer;
 	delete customFont;
 }
 
@@ -82,7 +81,7 @@ void GameManager::Init(int argc, char** argv) {
 	//
 	RoboPlayer = new Player();
 	EditorGUIRenderer = new EditorGUI(gContext);
-	SkyboxRenderer = new Skybox(SkyType::Spherical);
+	gContext.SkyboxRenderer = new Skybox(SkyType::Spherical);
 	gContext.pointlight.enable();
 	gContext.spotlight.enable();
 
@@ -155,6 +154,8 @@ void GameManager::Display() {
 	{
 		// Lock cursor for freelook in editor mode
 		glutSetCursor(GLUT_CURSOR_NONE);
+
+		pitch = (std::max)(MIN_PITCH_ANGLE, (std::min)(MAX_PITCH_ANGLE, pitch));
 
 		// Calculate the direction vector from the yaw and pitch angles
 		float dirX = sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
@@ -263,7 +264,7 @@ void GameManager::Update()
 
 //
 void GameManager::drawScene() {
-	SkyboxRenderer->draw();
+	gContext.SkyboxRenderer->draw();
 
 	glPushMatrix();
 	glTranslatef(gContext.pointlight.position[0], gContext.pointlight.position[1], gContext.pointlight.position[2]);

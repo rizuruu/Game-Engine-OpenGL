@@ -1,0 +1,138 @@
+# Blender MTL File: 'ELLIE Bella animation.blend'
+# Material Count: 12
+
+newmtl Model001_Material001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.033097 0.033097 0.033097
+Ks 0.250000 0.250000 0.250000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehead.png
+
+newmtl Model001_Material003
+Ns 900.000000
+Ka 0.350000 0.350000 0.350000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\ellieeyes.png
+
+newmtl Model001_Material004
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\ellieteeth.png
+
+newmtl Model001_Material005
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\hairtie.png
+
+newmtl Model001_Material006
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thin01.png
+map_d C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thin01.png
+
+newmtl Model001_Material007
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thin02.png
+map_d C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thin02.png
+
+newmtl Model001_Material008
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thick01.png
+map_d C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_thick01.png
+
+newmtl Model001_Material010
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_skullcap.png
+map_d C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehair_skullcap.png
+
+newmtl Model001_Material012
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\ellieshirt.png
+
+newmtl Model001_Material014
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliehands.png
+
+newmtl Model001_Material016
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\elliepants.png
+
+newmtl Model001_Material019
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Pizi\\Downloads\\the-last-of-us-2-young-ellie\\source\\ellieshoes.png

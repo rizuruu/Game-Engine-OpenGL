@@ -17,6 +17,8 @@ public:
     Transform Transform;
     std::string Name;
     Material Material;
+
+    void UpdateTextureForMaterial(const std::string& materialName, const std::string& texturePath);
 private:
     struct Vertex {
         GLfloat x, y, z;

@@ -230,3 +230,12 @@ bool ModelLoader::loadMtl(const std::string& filename) {
     mtlFile.close();
     return true;
 }
+
+void ModelLoader::UpdateTextureForMaterial(const std::string& materialName, const std::string& texturePath) {
+    if (loadTexture(texturePath)) {
+        materialTextures[materialName] = textureID;
+    }
+    else {
+        std::cerr << "Failed to update texture for material: " << materialName << std::endl;
+    }
+}

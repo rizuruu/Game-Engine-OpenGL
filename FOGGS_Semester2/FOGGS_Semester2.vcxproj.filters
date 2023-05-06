@@ -72,6 +72,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditorGUI.cpp" />
+    <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Art.h">

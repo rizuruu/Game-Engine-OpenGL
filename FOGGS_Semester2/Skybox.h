@@ -18,6 +18,9 @@ public:
     void draw();
 
     unsigned char* allocateBmp(char* filename, int& width, int& height);
+    void UpdateSky(const std::string& texturePath);
+
+    std::string CurrentSky = "";
 private:
     GLuint texNames[6];
     unsigned char* imageData[6];

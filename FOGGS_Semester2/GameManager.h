@@ -40,7 +40,6 @@ private:
 
 	//single point of access to all rendered objects
 	Scene gContext;
-	Skybox* SkyboxRenderer;
 	float* velocity = new float();
 	bool freeLook = true;
 	char inputText[256] = { 0 };
@@ -70,5 +69,7 @@ private:
 	Player* RoboPlayer;
 	ImFont* largerFont;
 	EditorGUI* EditorGUIRenderer;
+	const float MIN_PITCH_ANGLE = -89.0f;
+	const float MAX_PITCH_ANGLE = 89.0f;
 };
 

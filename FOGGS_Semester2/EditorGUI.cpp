@@ -9,8 +9,8 @@ using namespace std;
 
 EditorGUI::EditorGUI(Scene& scene) : sceneRef(scene)
 {
-	ReadFiles();
-
+	ReadFiles("obj");
+	ReadSkies("png");
 }
 
 void EditorGUI::Render()
@@ -23,6 +23,7 @@ void EditorGUI::Render()
 		ImportWindow();
 
 	InspectorWindow();
+	SkyWindow();
 
 	if (showLoading)
 	{
@@ -53,9 +54,10 @@ void EditorGUI::MenuBar()
 
 			if (ImGui::MenuItem("Load Scene"))
 			{
-				showLoading = true;
-				std::thread loadingThread(LoadSceneThread, std::ref(sceneRef), std::ref(*this));
-				loadingThread.detach();
+				LoadScene();
+				//showLoading = true;
+				//std::thread loadingThread(LoadSceneThread, std::ref(sceneRef), std::ref(*this));
+				//loadingThread.detach();
 			}
 
 			if (ImGui::MenuItem("Save Scene"))
@@ -84,6 +86,11 @@ void EditorGUI::MenuBar()
 			if (ImGui::MenuItem("Import Game Object"))
 			{
 				ImportWindowVisibility = true;
+			}
+
+			if (ImGui::MenuItem("Change Sky"))
+			{
+				sceneRef.SkyboxRenderer->UpdateSky("..\\Assets\\Textures\\Fantasy.png");
 			}
 
 			ImGui::EndMenu();
@@ -175,7 +182,7 @@ void EditorGUI::ImportWindow()
 		ImGui::SameLine();
 		if (ImGui::Button("Refresh"))
 		{
-			ReadFiles();
+			ReadFiles("obj");
 		}
 
 		ImGui::ListBox("##list", &importSelectionIndex,
@@ -235,6 +242,38 @@ void EditorGUI::InspectorWindow()
 			{
 				DeleteModel(sceneSelectionIndex);
 			}
+		}
+	}
+	ImGui::End();
+}
+
+void EditorGUI::SkyWindow()
+{
+	if (ImGui::Begin("Sky Settings"))
+	{
+		float fullWidth = ImGui::GetContentRegionAvailWidth();
+
+		ImGui::Text("Select cubemap for sky:");
+		ImGui::SameLine();
+		if (ImGui::Button("Refresh"))
+		{
+			ReadSkies("png");
+		}
+
+		ImGui::ListBox("##Skies", &skySelectionIndex,
+			[](void* data, int index, const char** out_text) {
+				*out_text = (*(std::vector<std::string>*)data)[index].c_str();
+				return true;
+			}, (void*)&skyboxFiles, skyboxFiles.size(), 5);
+
+		ImVec2 buttonSize(fullWidth, 30);
+		if (ImGui::Button("APPLY", buttonSize))
+		{
+			sceneRef.SkyboxRenderer->UpdateSky(skyPath + skyboxFiles[skySelectionIndex]);
+		}
+		if (ImGui::Button("CLOSE", buttonSize))
+		{
+			//sceneRef.SkyboxRenderer->UpdateSky(skyPath + skyboxFiles[skySelectionIndex]);
 		}
 	}
 	ImGui::End();
@@ -337,18 +376,19 @@ void EditorGUI::DeleteModel(int i)
 	delete obj;
 }
 
-void EditorGUI::ReadFiles()
+void EditorGUI::ReadFiles(string type)
 {
 	files.clear();
 #ifdef _WIN32
 	WIN32_FIND_DATAA fileData;
-	HANDLE hFind = FindFirstFileA((path + "*").c_str(), &fileData);
+	string filePath = type == "png" ? skyPath : path;
+	HANDLE hFind = FindFirstFileA((filePath + "*").c_str(), &fileData);
 
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				std::string filename = fileData.cFileName;
-				if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
+				if (filename.substr(filename.find_last_of(".") + 1) == type) {
 					files.push_back(filename);
 				}
 			}
@@ -364,6 +404,41 @@ void EditorGUI::ReadFiles()
 			std::string filename = entry->d_name;
 			if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
 				files.push_back(filename);
+			}
+		}
+		closedir(dir);
+	}
+#endif
+}
+
+void EditorGUI::ReadSkies(string type)
+{
+	skyboxFiles.clear();
+#ifdef _WIN32
+	WIN32_FIND_DATAA fileData;
+	string filePath = type == "png" ? skyPath : path;
+	HANDLE hFind = FindFirstFileA((filePath + "*").c_str(), &fileData);
+
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				std::string filename = fileData.cFileName;
+				if (filename.substr(filename.find_last_of(".") + 1) == type) {
+					skyboxFiles.push_back(filename);
+				}
+			}
+		} while (FindNextFileA(hFind, &fileData));
+		FindClose(hFind);
+	}
+#else
+	DIR* dir = opendir(path.c_str());
+
+	if (dir != nullptr) {
+		dirent* entry;
+		while ((entry = readdir(dir)) != nullptr) {
+			std::string filename = entry->d_name;
+			if (filename.substr(filename.find_last_of(".") + 1) == "obj") {
+				skyboxFiles.push_back(filename);
 			}
 		}
 		closedir(dir);

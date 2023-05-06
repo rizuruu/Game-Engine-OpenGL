@@ -156,6 +156,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Snowman.cpp" />
     <ClCompile Include="SpotLight.cpp" />
