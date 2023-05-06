@@ -62,7 +62,6 @@ void GameManager::Init(int argc, char** argv) {
 	else
 	{
 		glutSetCursor(GLUT_CURSOR_NONE);
-		//gContext.LoadScene("..\\Assets\\Editor\\Default.scene");
 	}
 	
 
@@ -85,6 +84,7 @@ void GameManager::Init(int argc, char** argv) {
 	gContext.SkyboxRenderer = new Skybox(SkyType::Spherical);
 	gContext.pointlight.enable();
 	gContext.spotlight.enable();
+	//gContext.LoadScene("..\\Assets\\Editor\\leon.scene");
 
 	//gContext.art.init();
 	// Setup style

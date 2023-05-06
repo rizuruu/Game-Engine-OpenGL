@@ -54,7 +54,7 @@ void EditorGUI::MenuBar()
 
 			if (ImGui::MenuItem("Load Scene"))
 			{
-				LoadScene();
+				sceneRef.LoadScene();
 				//showLoading = true;
 				//std::thread loadingThread(LoadSceneThread, std::ref(sceneRef), std::ref(*this));
 				//loadingThread.detach();
