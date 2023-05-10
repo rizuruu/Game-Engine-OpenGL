@@ -2,6 +2,7 @@
 #include <string>
 #include "Scene.h"
 #include <mutex>
+#include <unordered_map>
 
 using namespace std;
 
@@ -60,6 +61,12 @@ private:
 	bool ImportWindowVisibility = false;
 	bool showLoading = false;
 	const char* LoadingTitle = "";
+
+	std::unordered_map<std::string, bool> windowVisibility;
+	void ToggleWindowVisibility(const std::string& windowName);
 };
 
 void LoadSceneThread(Scene& sceneRef, EditorGUI& editorGUI);
+
+#define InspectorTitle "Inspector"
+#define SkyTitle "SkySettings"
