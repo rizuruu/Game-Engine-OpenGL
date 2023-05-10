@@ -452,6 +452,13 @@ void EditorGUI::ReadSkies(string type)
 #endif
 }
 
+void EditorGUI::ToggleWindowVisibility(const std::string& windowName) {
+	if (windowVisibility.find(windowName) == windowVisibility.end()) {
+		windowVisibility[windowName] = true;
+	}
+	// Toggle the visibility state of the window
+	windowVisibility[windowName] = !windowVisibility[windowName];
+}
 
 void LoadSceneThread(Scene& sceneRef, EditorGUI& editorGUI)
 {

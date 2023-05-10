@@ -20,7 +20,7 @@ public:
     static const float FarClippingPlane;
 
     // To check if it has to run it in Editor mode
-    static const bool EditorMode = false;
+    static const bool EditorMode = true;
 
     // Colors
     static const ImVec4 ButtonColor;

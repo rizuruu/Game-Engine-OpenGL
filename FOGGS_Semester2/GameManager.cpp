@@ -48,13 +48,6 @@ void GameManager::Init(int argc, char** argv) {
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("..\\Assets\\Fonts\\Comme-Medium.ttf", 21.0f);	// Load the model and texture
 
-	//try {
-	//	model = new ModelLoader("model");
-	//	Models.push_back(model);
-	//}
-	//catch (const std::exception& e) {
-	//	std::cerr << "Error: " << e.what() << std::endl;
-	//}
 	if (Constants::EditorMode)
 	{
 
@@ -247,13 +240,6 @@ void GameManager::Display() {
 	glFlush();
 	glutSwapBuffers();
 
-	//if (isEditor)
-	//{
-	//	glutIgnoreKeyRepeat(true);
-	//	glutKeyboardFunc(nullptr);
-	//}
-	//else
-	//	glutKeyboardFunc(keyboard);
 	// Draw the HUD text
 	glutPostRedisplay();
 }
