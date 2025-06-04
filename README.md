@@ -1,6 +1,6 @@
 # OpenGL based Game Engine
 
-![Game Engine](preview.jpg) 
+![Game Engine](preview.png) 
 
 This is a basic game engine that I made as a part of my university project with capability of loading 3D assets and rendering.
 
