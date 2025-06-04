@@ -17,3 +17,5 @@ This is a basic game engine that I made as a part of my university project with 
 - **Scene**: Like traditional game engines, it has a concept of scene which can be saved into a file and loaded.
 - **Skybox**: It also features a cubic texture skybox system.
 - **Editor GUI**: It is equipped with GUI based editor tools to import and load assets, change skybox, modify transform of objects and scene heirarchy.
+
+![Game Engine](Previews/preview_2.jpg) 
