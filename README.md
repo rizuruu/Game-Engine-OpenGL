@@ -19,3 +19,5 @@ This is a basic game engine that I made as a part of my university project with 
 - **Editor GUI**: It is equipped with GUI based editor tools to import and load assets, change skybox, modify transform of objects and scene heirarchy.
 
 ![Game Engine](Previews/preview_2.jpg) 
+
+![Game Engine](Previews/preview_3.jpg) 
